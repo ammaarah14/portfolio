@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TRSH Results Portal — Interactive Prototype</title>
+<script>if (/[?&]embed(=|&|$)/.test(location.search)) document.documentElement.classList.add("embed");</script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f0f2f7;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button { font-family: 'Inter', sans-serif; }
+  input { font-family: 'Inter', sans-serif; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .navlinks { position: fixed; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center; z-index: 50; pointer-events: none; }
+  .navlinks a { pointer-events: auto; text-decoration: none; font-size: 12px; font-weight: 600; color: #fff; background: #0F1D52; border-radius: 10px; padding: 8px 14px; box-shadow: 0 4px 14px rgba(15,29,82,.25); }
+  .navlinks a:hover { background: #2541B2; }
+  html.embed body { background: #0F1D52; min-height: 0; height: 100vh; overflow: hidden; }
+  html.embed .navlinks { display: none; }
+</style>
+</head>
+<body>
+<nav class="navlinks" aria-label="Site navigation">
+  <a href="graphic-design.html#prototype">&larr; Back to graphic design</a>
+  <a href="index.html#work">Portfolio home</a>
+</nav>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const NAVY      = "#0F1D52";
+const ROYAL     = "#2541B2";
+const GOLD      = "#C9A227";
+const GOLD_LIGHT= "#E8C766";
+const GREY_DARK = "#2B2D33";
+const PASS      = "#1F7A4D";
+const FAIL      = "#B3261E";
+
+/* ─── Seal SVG ─── */
+const Seal = ({ size = 72 }) => (
+  <svg viewBox="0 0 100 100" width={size} height={size}>
+    <circle cx="50" cy="50" r="47" fill="none" stroke={GOLD} strokeWidth="2"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke={GOLD} strokeWidth="1"/>
+    <circle cx="50" cy="50" r="34" fill={NAVY}/>
+    <path d="M50 32 L58 48 L50 68 L42 48 Z" fill={GOLD}/>
+  </svg>
+);
+
+/* ─── Status bar ─── */
+const StatusBar = ({ dark = false }) => (
+  <div style={{ display:"flex", justifyContent:"space-between", padding:"8px 16px 2px",
+    fontSize:10, color: dark ? "#fff" : GREY_DARK,
+    position:"absolute", top:0, left:0, right:0, zIndex:2 }}>
+    <span>9:41</span><span>●●● 100%</span>
+  </div>
+);
+
+/* ─── Top bar ─── */
+const TopBar = ({ title, onBack, rightIcon }) => (
+  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+    padding:"30px 14px 12px", color:NAVY }}>
+    <div style={{ width:20 }}>
+      {onBack && (
+        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:0, color:NAVY }}>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+      )}
+    </div>
+    <div style={{ fontWeight:700, fontSize:14 }}>{title}</div>
+    <div style={{ width:20 }}>{rightIcon}</div>
+  </div>
+);
+
+/* ─── Pill badge ─── */
+const Pill = ({ type }) => {
+  const map = {
+    pass:     { bg:"#e3f3ea", color:PASS,  label:"Pass" },
+    fail:     { bg:"#fbe8e7", color:FAIL,  label:"Not Yet Eligible" },
+    verified: { bg:"#eef1fb", color:ROYAL, label:"Verified" },
+  };
+  const s = map[type];
+  return (
+    <span style={{ display:"inline-block", fontSize:10, fontWeight:700,
+      padding:"3px 9px", borderRadius:20, background:s.bg, color:s.color }}>
+      {s.label}
+    </span>
+  );
+};
+
+/* ─── Bottom nav ─── */
+const BottomNav = ({ active, navigate }) => {
+  const items = [
+    { key:"home",    label:"Home",    screen:"home",
+      icon:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg> },
+    { key:"results", label:"Results", screen:"results",
+      icon:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg> },
+    { key:"letters", label:"Letters", screen:"letters",
+      icon:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg> },
+    { key:"profile", label:"Profile", screen:"profile",
+      icon:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg> },
+  ];
+  return (
+    <div style={{ display:"flex", justifyContent:"space-around", padding:"9px 0 12px",
+      borderTop:"1px solid #ebedf1", background:"#fff" }}>
+      {items.map(it => (
+        <button key={it.key} onClick={() => navigate(it.screen)}
+          style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+            color: active===it.key ? NAVY : "#b2b5bc", fontSize:9, fontWeight:600,
+            background:"none", border:"none", cursor:"pointer", padding:0 }}>
+          {it.icon}<span>{it.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
+/* ─── Button components ─── */
+const BtnPrimary = ({ children, onClick, style: s = {} }) => (
+  <button onClick={onClick} style={{ background:NAVY, color:"#fff", border:"none",
+    borderRadius:10, padding:13, fontWeight:600, fontSize:13, cursor:"pointer",
+    width:"100%", ...s }}>{children}</button>
+);
+const BtnSecondary = ({ children, onClick, style: s = {} }) => (
+  <button onClick={onClick} style={{ background:"#fff", color:NAVY,
+    border:`1.5px solid ${NAVY}`, borderRadius:10, padding:"11px",
+    fontWeight:600, fontSize:12.5, cursor:"pointer", width:"100%", ...s }}>{children}</button>
+);
+
+/* ════════════════════════════════════════════
+   SCREENS
+   ════════════════════════════════════════════ */
+
+const SplashScreen = ({ navigate }) => (
+  <div onClick={() => navigate("welcome")} style={{ flex:1, display:"flex", flexDirection:"column",
+    alignItems:"center", justifyContent:"center",
+    background:`linear-gradient(160deg,${NAVY},#16236b)`, cursor:"pointer", position:"relative" }}>
+    <div style={{ textAlign:"center", color:"#fff" }}>
+      <Seal size={86}/>
+      <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:19, marginTop:10, letterSpacing:1 }}>TRSH</div>
+      <div style={{ fontSize:9, letterSpacing:2.5, color:GOLD_LIGHT }}>RESULTS PORTAL</div>
+    </div>
+    <div style={{ position:"absolute", bottom:22, left:0, right:0, textAlign:"center", fontSize:9.5, color:"#9aa3d6" }}>
+      Certified by Mzuvukile Slabbert Radebe Institute
+    </div>
+  </div>
+);
+
+const WelcomeScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"54px 18px 18px" }}>
+      <div style={{ marginBottom:14 }}><Seal size={72}/></div>
+      <h1 style={{ fontFamily:"'Source Serif 4',Georgia,serif", color:NAVY, fontSize:19, lineHeight:1.3, margin:"0 0 8px" }}>
+        Welcome to the<br/>Results Portal
+      </h1>
+      <p style={{ color:"#6b6f76", fontSize:13, lineHeight:1.45, margin:0 }}>
+        View your examination results, confirm pilgrimage eligibility, and download official letters — all in one secure place.
+      </p>
+      <div style={{ display:"flex", gap:6, margin:"18px 0" }}>
+        <span style={{ width:6, height:6, borderRadius:"50%", background:GOLD, display:"inline-block" }}/>
+        <span style={{ width:6, height:6, borderRadius:"50%", background:"#dcdfe6", display:"inline-block" }}/>
+        <span style={{ width:6, height:6, borderRadius:"50%", background:"#dcdfe6", display:"inline-block" }}/>
+      </div>
+      <div style={{ marginTop:"auto" }}><BtnPrimary onClick={() => navigate("signin")}>Continue</BtnPrimary></div>
+    </div>
+  </>
+);
+
+const SignInScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"54px 18px 18px" }}>
+      <div style={{ textAlign:"center", marginBottom:18 }}>
+        <Seal size={56}/>
+        <h2 style={{ fontFamily:"'Source Serif 4',Georgia,serif", color:NAVY, margin:"14px 0 4px", fontSize:18 }}>Sign in to continue</h2>
+        <p style={{ color:"#6b6f76", fontSize:12.5, margin:0 }}>Use an account you already trust.</p>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+        {[
+          { color:"#4285F4", label:"Continue with Google" },
+          { color:"#2F2F2F", label:"Continue with Microsoft" },
+          { color:"#000",    label:"Continue with Apple" },
+        ].map(o => (
+          <button key={o.label} onClick={() => navigate("verify")}
+            style={{ display:"flex", alignItems:"center", gap:10, border:"1px solid #e2e4ea",
+              borderRadius:10, padding:"11px 14px", fontSize:12.5, fontWeight:600,
+              background:"#fff", color:GREY_DARK, cursor:"pointer" }}>
+            <span style={{ width:16, height:16, borderRadius:"50%", background:o.color, display:"inline-block" }}/>
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <p style={{ fontSize:11, color:"#9a9da3", textAlign:"center", marginTop:"auto" }}>
+        By continuing you agree to the TRSH Member Terms and Privacy Notice.
+      </p>
+    </div>
+  </>
+);
+
+const VerifyScreen = ({ navigate }) => {
+  const [value, setValue] = useState("");
+  const VALID = "TRSH-2024-00482";
+  const handleVerify = () => {
+    if (value.trim().toUpperCase() === VALID) navigate("verify-loading");
+    else navigate("verify-fail");
+  };
+  return (
+    <>
+      <StatusBar/>
+      <TopBar title="Verify Membership" onBack={() => navigate("signin")}/>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 18px 18px" }}>
+        <p style={{ color:"#6b6f76", fontSize:12.5, margin:"0 0 6px" }}>Enter the membership number found on your TRSH membership card.</p>
+        <label style={{ fontSize:11.5, fontWeight:600, color:NAVY, marginTop:14, display:"block" }}>Membership Number</label>
+        <input value={value} onChange={e => setValue(e.target.value)} placeholder="e.g. TRSH-2024-00482"
+          style={{ width:"100%", border:"1.5px solid #d8dbe2", borderRadius:9,
+            padding:"11px 12px", fontSize:13, marginTop:6, color:GREY_DARK, boxSizing:"border-box" }}/>
+        <p style={{ fontSize:11, color:"#9a9da3", margin:"6px 0 0" }}>
+          Hint: tap{" "}
+          <span onClick={() => setValue(VALID)} style={{ color:ROYAL, cursor:"pointer", fontWeight:600 }}>TRSH-2024-00482</span>
+          {" "}(valid) or type anything else (fail)
+        </p>
+        <BtnPrimary onClick={handleVerify} style={{ marginTop:24, opacity: value.trim() ? 1 : 0.5 }}>Verify Membership</BtnPrimary>
+        <p style={{ fontSize:11, color:"#9a9da3", textAlign:"center", marginTop:"auto" }}>
+          Having trouble?{" "}
+          <span onClick={() => navigate("contact")} style={{ color:ROYAL, cursor:"pointer", fontWeight:600 }}>Contact Support</span>
+        </p>
+      </div>
+    </>
+  );
+};
+
+const VerifyLoadingScreen = ({ navigate }) => {
+  useEffect(() => { const t = setTimeout(() => navigate("home"), 1800); return () => clearTimeout(t); }, []);
+  return (
+    <>
+      <StatusBar/>
+      <TopBar title="Verify Membership"/>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24 }}>
+        <div style={{ width:34, height:34, borderRadius:"50%", border:"3px solid #e2e4ea",
+          borderTopColor:NAVY, animation:"spin 1s linear infinite" }}/>
+        <p style={{ color:"#6b6f76", fontSize:12.5, marginTop:16, textAlign:"center" }}>Checking your membership number…</p>
+      </div>
+    </>
+  );
+};
+
+const VerifyFailScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Verify Membership" onBack={() => navigate("verify")}/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center",
+      justifyContent:"center", padding:"0 24px 24px" }}>
+      <div style={{ width:64, height:64, borderRadius:"50%", background:"#fbe8e7",
+        display:"flex", alignItems:"center", justifyContent:"center", marginBottom:20 }}>
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke={FAIL} strokeWidth="2.2" strokeLinecap="round">
+          <circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>
+        </svg>
+      </div>
+      <h2 style={{ fontFamily:"'Source Serif 4',Georgia,serif", textAlign:"center", color:NAVY, fontSize:18, margin:"0 0 10px" }}>
+        Membership Not Found
+      </h2>
+      <p style={{ color:"#6b6f76", fontSize:12.5, textAlign:"center", lineHeight:1.55, margin:"0 0 8px" }}>
+        We couldn't find a TRSH membership record matching that number.
+      </p>
+      <p style={{ color:"#6b6f76", fontSize:12.5, textAlign:"center", lineHeight:1.55, margin:"0 0 28px" }}>
+        Please double-check the number on your membership card and try again.
+      </p>
+      <div style={{ width:"100%", background:"#fff8ec", border:`1px solid ${GOLD}`,
+        borderRadius:10, padding:"12px 14px", marginBottom:20 }}>
+        <div style={{ fontSize:11.5, color:"#6b6f76", lineHeight:1.5 }}>
+          <b style={{ color:GREY_DARK }}>Common reasons:</b>
+          <ul style={{ margin:"4px 0 0", paddingLeft:16 }}>
+            <li>Number entered with spaces or extra characters</li>
+            <li>Card not yet registered in the system</li>
+            <li>Membership has not been activated</li>
+          </ul>
+        </div>
+      </div>
+      <BtnPrimary onClick={() => navigate("verify")} style={{ marginBottom:10 }}>Try Again</BtnPrimary>
+      <BtnSecondary onClick={() => navigate("contact")}>Contact Support</BtnSecondary>
+    </div>
+  </>
+);
+
+const LoadingScreen = ({ navigate }) => {
+  useEffect(() => { const t = setTimeout(() => navigate("home"), 1500); return () => clearTimeout(t); }, []);
+  return (
+    <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ width:34, height:34, borderRadius:"50%", border:"3px solid #e2e4ea",
+        borderTopColor:NAVY, animation:"spin 1s linear infinite" }}/>
+      <p style={{ color:"#6b6f76", fontSize:12.5, marginTop:14 }}>Retrieving your results…</p>
+    </div>
+  );
+};
+
+const HomeScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"36px 16px 0", overflowY:"auto" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+        <div>
+          <div style={{ color:"#6b6f76", fontSize:12.5 }}>Welcome back,</div>
+          <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", color:NAVY, fontSize:19 }}>Nomvula Khumalo</div>
+          <div style={{ color:"#6b6f76", fontSize:12.5 }}>No. TRSH-2024-00482</div>
+        </div>
+        <Seal size={40}/>
+      </div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, background:PASS,
+        borderRadius:12, padding:"13px 14px", marginBottom:18, color:"#fff" }}>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" strokeWidth="2.4"><path d="M5 13l4 4 10-10"/></svg>
+        <div>
+          <div style={{ fontWeight:700, fontSize:13 }}>Eligible for Pilgrimage</div>
+          <div style={{ fontSize:10.5, opacity:.85 }}>Both assessments verified</div>
+        </div>
+      </div>
+      <div style={{ fontSize:10, letterSpacing:1.5, color:"#9a9da3", fontWeight:700, margin:"0 0 8px" }}>EXAMINATION SUMMARY</div>
+      <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+        {[
+          { label:"Revelation Spiritual Home Test", score:"88%" },
+          { label:"Ubukhosi Bomoya Test",           score:"91%" },
+        ].map(c => (
+          <div key={c.label} style={{ flex:1, border:"1px solid #ebedf1", borderRadius:10, padding:10 }}>
+            <div style={{ color:"#6b6f76", fontSize:11 }}>{c.label}</div>
+            <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:22, color:NAVY, margin:"4px 0" }}>{c.score}</div>
+            <Pill type="pass"/>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize:10, letterSpacing:1.5, color:"#9a9da3", fontWeight:700, margin:"0 0 8px" }}>RECENT UPDATES</div>
+      {["Ubukhosi Bomoya acceptance letter issued","Revelation Spiritual Home results verified"].map(u => (
+        <div key={u} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11.5,
+          color:GREY_DARK, padding:"6px 0", borderBottom:"1px solid #f1f2f5" }}>
+          <span style={{ width:6, height:6, borderRadius:"50%", background:GOLD, display:"inline-block", flexShrink:0 }}/>
+          {u}
+        </div>
+      ))}
+    </div>
+    <BottomNav active="home" navigate={navigate}/>
+  </>
+);
+
+const HomePartialScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"36px 16px 0", overflowY:"auto" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+        <div>
+          <div style={{ color:"#6b6f76", fontSize:12.5 }}>Welcome back,</div>
+          <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", color:NAVY, fontSize:19 }}>Nomvula Khumalo</div>
+          <div style={{ color:"#6b6f76", fontSize:12.5 }}>No. TRSH-2024-00482</div>
+        </div>
+        <Seal size={40}/>
+      </div>
+      {/* Partial eligibility banner */}
+      <div style={{ display:"flex", alignItems:"flex-start", gap:12, background:"#FFF8EC",
+        border:`1.5px solid ${GOLD}`, borderRadius:12, padding:"13px 14px", marginBottom:18 }}>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, marginTop:1 }}>
+          <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>
+        </svg>
+        <div>
+          <div style={{ fontWeight:700, fontSize:13, color:GREY_DARK }}>Not Yet Eligible for Pilgrimage</div>
+          <div style={{ fontSize:10.5, color:"#6b6f76", marginTop:2, lineHeight:1.4 }}>1 of 2 assessments outstanding</div>
+        </div>
+      </div>
+      {/* Outstanding test alert */}
+      <div style={{ background:"#fbe8e7", borderRadius:10, padding:"10px 13px",
+        marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke={FAIL} strokeWidth="2" strokeLinecap="round" style={{ flexShrink:0 }}>
+          <circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>
+        </svg>
+        <div style={{ fontSize:11.5, color:FAIL, lineHeight:1.45 }}>
+          <b>Ubukhosi Bomoya Test</b> result is still outstanding. Complete this assessment to become eligible.
+        </div>
+      </div>
+      <div style={{ fontSize:10, letterSpacing:1.5, color:"#9a9da3", fontWeight:700, margin:"0 0 8px" }}>EXAMINATION SUMMARY</div>
+      <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+        <div style={{ flex:1, border:"1px solid #ebedf1", borderRadius:10, padding:10 }}>
+          <div style={{ color:"#6b6f76", fontSize:11 }}>Revelation Spiritual Home Test</div>
+          <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:22, color:NAVY, margin:"4px 0" }}>88%</div>
+          <Pill type="pass"/>
+        </div>
+        <div style={{ flex:1, border:`1px dashed ${GOLD}`, borderRadius:10, padding:10, background:"#fffdf8" }}>
+          <div style={{ color:"#6b6f76", fontSize:11 }}>Ubukhosi Bomoya Test</div>
+          <div style={{ fontSize:12, fontWeight:700, color:"#9a9da3", margin:"6px 0 6px", display:"flex", alignItems:"center", gap:4 }}>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#b2b5bc" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Pending
+          </div>
+          <span style={{ display:"inline-block", fontSize:10, fontWeight:700, padding:"3px 9px",
+            borderRadius:20, background:"#f4f5f7", color:"#9a9da3" }}>Awaiting Result</span>
+        </div>
+      </div>
+      {/* Progress bar */}
+      <div style={{ marginBottom:16 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"#6b6f76", marginBottom:5 }}>
+          <span>Eligibility progress</span>
+          <span style={{ fontWeight:700, color:NAVY }}>1 / 2 complete</span>
+        </div>
+        <div style={{ height:6, background:"#ebedf1", borderRadius:99, overflow:"hidden" }}>
+          <div style={{ width:"50%", height:"100%", background:`linear-gradient(90deg,${GOLD},${GOLD_LIGHT})`, borderRadius:99 }}/>
+        </div>
+      </div>
+      <div style={{ fontSize:10, letterSpacing:1.5, color:"#9a9da3", fontWeight:700, margin:"0 0 8px" }}>RECENT UPDATES</div>
+      {["Revelation Spiritual Home results verified","Ubukhosi Bomoya Test result not yet available"].map((u,i) => (
+        <div key={u} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11.5,
+          color:GREY_DARK, padding:"6px 0", borderBottom:"1px solid #f1f2f5" }}>
+          <span style={{ width:6, height:6, borderRadius:"50%",
+            background: i===0 ? GOLD : "#dcdfe6", display:"inline-block", flexShrink:0 }}/>
+          {u}
+        </div>
+      ))}
+    </div>
+    <BottomNav active="home" navigate={navigate}/>
+  </>
+);
+
+const NotificationScreen = ({ navigate }) => {
+  const [tapped, setTapped] = useState(null);
+  const handleTap = (idx) => {
+    setTapped(idx);
+    setTimeout(() => navigate("home"), 480);
+  };
+  const stars = [[15,12],[60,25],[82,8],[35,40],[70,55],[20,68],[90,75],[48,82],[10,90],[75,18]];
+  return (
+    <div style={{ flex:1, display:"flex", flexDirection:"column", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", inset:0, background:"linear-gradient(175deg,#0a1236 0%,#1a2c6b 45%,#0d1f4a 100%)" }}/>
+      {stars.map(([x,y],i) => (
+        <div key={i} style={{ position:"absolute", left:`${x}%`, top:`${y}%`,
+          width: i%3===0?2:1, height: i%3===0?2:1, borderRadius:"50%", background:"rgba(255,255,255,0.55)" }}/>
+      ))}
+      <div style={{ position:"relative", zIndex:2, display:"flex", justifyContent:"space-between",
+        padding:"10px 18px 0", fontSize:11, color:"#fff", fontWeight:600 }}>
+        <span>9:41</span><span>●●● 100%</span>
+      </div>
+      <div style={{ position:"relative", zIndex:2, textAlign:"center", paddingTop:28, paddingBottom:24 }}>
+        <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:52, color:"#fff",
+          fontWeight:300, letterSpacing:-1, lineHeight:1 }}>9:41</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.7)", marginTop:6 }}>Tuesday, 4 March 2025</div>
+      </div>
+      <div style={{ position:"relative", zIndex:2, padding:"0 14px", display:"flex", flexDirection:"column", gap:10 }}>
+        {/* Result notification */}
+        <div onClick={() => handleTap(0)} style={{
+          background: tapped===0 ? "rgba(201,162,39,0.25)" : "rgba(255,255,255,0.14)",
+          backdropFilter:"blur(20px)", borderRadius:16, padding:"13px 14px", cursor:"pointer",
+          border: tapped===0 ? `1px solid rgba(201,162,39,0.6)` : "1px solid rgba(255,255,255,0.1)",
+          transition:"all 0.2s ease" }}>
+          <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
+            <div style={{ width:36, height:36, borderRadius:10, background:NAVY,
+              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Seal size={24}/>
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.9)" }}>TRSH Results Portal</span>
+                <span style={{ fontSize:10, color:"rgba(255,255,255,0.45)" }}>now</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:2 }}>Your result is ready 🎉</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.75)", lineHeight:1.4 }}>
+                Ubukhosi Bomoya Test —{" "}
+                <span style={{ color:GOLD_LIGHT, fontWeight:600 }}>Pass · 91%</span>. Tap to view your result.
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Eligibility notification */}
+        <div onClick={() => handleTap(1)} style={{
+          background: tapped===1 ? "rgba(31,122,77,0.3)" : "rgba(255,255,255,0.10)",
+          backdropFilter:"blur(20px)", borderRadius:16, padding:"13px 14px", cursor:"pointer",
+          border: tapped===1 ? `1px solid rgba(31,122,77,0.5)` : "1px solid rgba(255,255,255,0.08)",
+          transition:"all 0.2s ease" }}>
+          <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
+            <div style={{ width:36, height:36, borderRadius:10, background:PASS,
+              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 13l4 4 10-10"/>
+              </svg>
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.9)" }}>TRSH Results Portal</span>
+                <span style={{ fontSize:10, color:"rgba(255,255,255,0.45)" }}>now</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:2 }}>Pilgrimage eligibility confirmed</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.75)", lineHeight:1.4 }}>
+                Both assessments complete. Your acceptance letter is ready to download.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ textAlign:"center", marginTop:6, fontSize:11, color:"rgba(255,255,255,0.4)" }}>
+          Tap a notification to open
+        </div>
+      </div>
+      <div style={{ position:"relative", zIndex:2, marginTop:"auto",
+        display:"flex", justifyContent:"space-between", padding:"0 28px 28px", alignItems:"center" }}>
+        {[
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.08 4.18 2 2 0 0 1 5.07 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        ].map((icon, i) => (
+          <div key={i} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+            <div style={{ width:44, height:44, borderRadius:"50%", background:"rgba(255,255,255,0.12)",
+              display:"flex", alignItems:"center", justifyContent:"center" }}>{icon}</div>
+            <span style={{ fontSize:10, color:"rgba(255,255,255,0.4)" }}>{i===0?"Unlock":"Call"}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ResultsScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Results"/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px", overflowY:"auto" }}>
+      {[
+        { title:"Revelation Spiritual Home Test",       score:"88%", date:"14 Feb 2025", screen:"result-rsh" },
+        { title:"Ubukhosi Bomoya Test (Ultimate Test)", score:"91%", date:"02 Mar 2025", screen:"result-ub" },
+      ].map(r => (
+        <div key={r.title} style={{ border:"1px solid #ebedf1", borderRadius:12, padding:13, marginBottom:12 }}>
+          <div style={{ fontWeight:700, fontSize:13, color:NAVY, marginBottom:8 }}>{r.title}</div>
+          {[
+            { label:"Score",        value:r.score },
+            { label:"Status",       isPill:"pass" },
+            { label:"Completed",    value:r.date },
+            { label:"Verification", isPill:"verified" },
+          ].map((row,i) => (
+            <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", fontSize:11.5 }}>
+              <span style={{ color:"#6b6f76" }}>{row.label}</span>
+              {row.isPill ? <Pill type={row.isPill}/> : <span style={{ fontWeight:600 }}>{row.value}</span>}
+            </div>
+          ))}
+          <BtnSecondary onClick={() => navigate(r.screen)} style={{ marginTop:8 }}>View Details</BtnSecondary>
+        </div>
+      ))}
+    </div>
+    <BottomNav active="results" navigate={navigate}/>
+  </>
+);
+
+const ResultDetailScreen = ({ navigate, title, score, date, back }) => (
+  <>
+    <StatusBar/>
+    <TopBar title={title} onBack={() => navigate(back || "results")}/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px 16px", alignItems:"center", overflowY:"auto" }}>
+      <Seal size={72}/>
+      <h2 style={{ fontFamily:"'Source Serif 4',Georgia,serif", textAlign:"center", marginTop:10,
+        color:NAVY, fontSize:17, margin:"10px 0 4px" }}>{title}</h2>
+      <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:40, color:NAVY, margin:"6px 0 4px" }}>{score}</div>
+      <div style={{ marginBottom:18 }}><Pill type="pass"/></div>
+      <div style={{ border:"1px solid #ebedf1", borderRadius:12, padding:13, width:"100%", boxSizing:"border-box" }}>
+        {[
+          { label:"Examination Name",    value: title },
+          { label:"Date Completed",      value: date },
+          { label:"Verification Status", value: "Verified by MSRI", highlight:true },
+        ].map((row,i) => (
+          <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0",
+            fontSize:11.5, alignItems:"center" }}>
+            <span style={{ color:"#6b6f76" }}>{row.label}</span>
+            <span style={{ fontWeight:600, fontSize:11, maxWidth:"55%", textAlign:"right",
+              color: row.highlight ? ROYAL : GREY_DARK }}>{row.value}</span>
+          </div>
+        ))}
+      </div>
+      <BtnPrimary onClick={() => navigate("letter-preview")} style={{ marginTop:18 }}>View Acceptance Letter</BtnPrimary>
+    </div>
+    <BottomNav active="results" navigate={navigate}/>
+  </>
+);
+
+const LettersScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Acceptance Letters"/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px", overflowY:"auto" }}>
+      {[
+        { label:"Revelation Spiritual Home Acceptance Letter", date:"Issued 18 Feb 2025" },
+        { label:"Ubukhosi Bomoya Acceptance Letter",           date:"Issued 05 Mar 2025" },
+      ].map(l => (
+        <button key={l.label} onClick={() => navigate("letter-preview")}
+          style={{ display:"flex", alignItems:"center", gap:10, border:"1px solid #ebedf1",
+            borderRadius:12, padding:11, marginBottom:10, background:"#fff",
+            cursor:"pointer", width:"100%", textAlign:"left" }}>
+          <Seal size={36}/>
+          <div style={{ flex:1 }}>
+            <div style={{ fontWeight:700, fontSize:13, color:NAVY }}>{l.label}</div>
+            <div style={{ color:"#6b6f76", fontSize:11 }}>{l.date}</div>
+          </div>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke={NAVY} strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      ))}
+    </div>
+    <BottomNav active="letters" navigate={navigate}/>
+  </>
+);
+
+const LetterPreviewScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Letter Preview" onBack={() => navigate("letters")}
+      rightIcon={<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v7h16v-7"/><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/></svg>}/>
+    <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", background:"#e7e9ee", padding:14 }}>
+      <div style={{ background:"#fff", width:"100%", maxWidth:198, padding:"16px 12px",
+        borderRadius:4, boxShadow:"0 4px 14px rgba(0,0,0,.12)", textAlign:"center" }}>
+        <div style={{ display:"flex", justifyContent:"center", marginBottom:6 }}><Seal size={46}/></div>
+        <div style={{ fontSize:9, fontWeight:700, letterSpacing:1, color:NAVY }}>MZUVUKILE SLABBERT RADEBE INSTITUTE</div>
+        <div style={{ fontFamily:"'Source Serif 4',Georgia,serif", fontSize:12, color:GOLD, marginTop:2 }}>Certificate of Acceptance</div>
+        <div style={{ height:1, background:"#e2e4ea", margin:"8px 0" }}/>
+        {[["Member","Nomvula Khumalo"],["Membership No.","TRSH-2024-00482"],
+          ["Examination","Ubukhosi Bomoya Test"],["Result","Pass — 91%"],["Date Issued","05 Mar 2025"]].map(([k,v]) => (
+          <div key={k} style={{ display:"flex", justifyContent:"space-between", fontSize:9, padding:"3px 0", textAlign:"left" }}>
+            <span style={{ color:"#6b6f76" }}>{k}</span><b style={{ color:GREY_DARK }}>{v}</b>
+          </div>
+        ))}
+        <div style={{ marginTop:14, borderTop:"1px solid #cfd2da", paddingTop:4, fontSize:8, color:"#9a9da3", textAlign:"left" }}>Authorised Signature</div>
+        <div style={{ width:34, height:34, background:"repeating-linear-gradient(45deg,#0F1D52 0 3px,#fff 3px 6px)", margin:"8px auto 0" }}/>
+      </div>
+    </div>
+    <div style={{ display:"flex", justifyContent:"space-around", padding:"10px 8px", borderTop:"1px solid #ebedf1" }}>
+      {["View","Download","Print","Share"].map(l => (
+        <button key={l} style={{ background:"#eef1fb", color:NAVY, border:"none", fontSize:10,
+          fontWeight:700, borderRadius:14, padding:"6px 10px", cursor:"pointer" }}>{l}</button>
+      ))}
+    </div>
+  </>
+);
+
+const ProfileScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Profile"/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px 16px", alignItems:"center", overflowY:"auto" }}>
+      <div style={{ width:60, height:60, borderRadius:"50%", background:NAVY, color:"#fff",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        fontWeight:700, fontSize:18, fontFamily:"'Source Serif 4',Georgia,serif", marginBottom:6 }}>NK</div>
+      <h2 style={{ fontFamily:"'Source Serif 4',Georgia,serif", marginTop:10, color:NAVY, fontSize:18, margin:"10px 0 2px" }}>Nomvula Khumalo</h2>
+      <div style={{ color:"#6b6f76", fontSize:12.5 }}>TRSH-2024-00482</div>
+      <div style={{ border:"1px solid #ebedf1", borderRadius:12, padding:13, width:"100%", boxSizing:"border-box", marginTop:18 }}>
+        {[["Email","n.khumalo@mail.com"],["Signed in with","Google"]].map(([k,v]) => (
+          <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", fontSize:11.5 }}>
+            <span style={{ color:"#6b6f76" }}>{k}</span><span style={{ fontWeight:600 }}>{v}</span>
+          </div>
+        ))}
+      </div>
+      <BtnSecondary style={{ marginTop:18 }}>Update Profile</BtnSecondary>
+      <BtnSecondary onClick={() => navigate("support")} style={{ marginTop:8 }}>Contact Support</BtnSecondary>
+      <button onClick={() => navigate("splash")} style={{ background:"none", border:"none",
+        color:FAIL, fontWeight:600, fontSize:12.5, marginTop:6, cursor:"pointer" }}>Log Out</button>
+    </div>
+    <BottomNav active="profile" navigate={navigate}/>
+  </>
+);
+
+const SupportScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Help & Support" onBack={() => navigate("profile")}/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px 16px", overflowY:"auto" }}>
+      {[
+        { q:"How do I verify my membership number?", a:"Enter the number exactly as printed on your membership card." },
+        { q:"When will my results be available?",    a:"Results are published once verified by MSRI." },
+        { q:"I can't download my letter.",           a:"Check your connection, then try again." },
+      ].map(f => (
+        <div key={f.q} style={{ borderBottom:"1px solid #ebedf1", padding:"12px 0", fontSize:12.5 }}>
+          <b style={{ color:GREY_DARK }}>{f.q}</b>
+          <p style={{ color:"#6b6f76", fontSize:12.5, margin:"4px 0 0", lineHeight:1.45 }}>{f.a}</p>
+        </div>
+      ))}
+      <BtnPrimary onClick={() => navigate("contact")} style={{ marginTop:20 }}>Contact Support</BtnPrimary>
+    </div>
+  </>
+);
+
+const ContactScreen = ({ navigate }) => (
+  <>
+    <StatusBar/>
+    <TopBar title="Contact Information" onBack={() => navigate("support")}/>
+    <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"0 16px 16px" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+        <Seal size={34}/>
+        <div>
+          <div style={{ fontWeight:700, fontSize:14, color:NAVY }}>MSRI Administration</div>
+          <div style={{ color:"#6b6f76", fontSize:11 }}>admin@msri.org.za</div>
+        </div>
+      </div>
+      <div style={{ border:"1px solid #ebedf1", borderRadius:12, padding:13 }}>
+        {[["Phone","+27 11 000 0000"],["Office Hours","Mon–Fri, 08:00–16:00"]].map(([k,v]) => (
+          <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", fontSize:11.5 }}>
+            <span style={{ color:"#6b6f76" }}>{k}</span><span style={{ fontWeight:600 }}>{v}</span>
+          </div>
+        ))}
+      </div>
+      <BtnPrimary style={{ marginTop:20 }}>Send a Message</BtnPrimary>
+    </div>
+  </>
+);
+
+const ErrorScreen = ({ navigate }) => (
+  <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24 }}>
+    <div style={{ width:46, height:46, borderRadius:"50%", background:"#fbe8e7", color:FAIL,
+      fontWeight:700, fontSize:22, display:"flex", alignItems:"center", justifyContent:"center" }}>!</div>
+    <h2 style={{ fontFamily:"'Source Serif 4',Georgia,serif", textAlign:"center", marginTop:14, color:NAVY, fontSize:18 }}>Something Went Wrong</h2>
+    <p style={{ color:"#6b6f76", fontSize:12.5, textAlign:"center", lineHeight:1.45 }}>We couldn't load this page. Check your connection and try again.</p>
+    <BtnPrimary onClick={() => navigate("home")} style={{ marginTop:16 }}>Try Again</BtnPrimary>
+  </div>
+);
+
+/* ════════════════════════════════════════════
+   SCREEN REGISTRY
+   ════════════════════════════════════════════ */
+const ALL_SCREENS = [
+  { key:"splash",          label:"Splash" },
+  { key:"welcome",         label:"Welcome" },
+  { key:"signin",          label:"Sign In" },
+  { key:"verify",          label:"Membership" },
+  { key:"verify-loading",  label:"Checking" },
+  { key:"verify-fail",     label:"Not Found" },
+  { key:"home",            label:"Dashboard ✓" },
+  { key:"home-partial",    label:"Dashboard ½" },
+  { key:"notification",    label:"Result Drop" },
+  { key:"results",         label:"Results" },
+  { key:"result-rsh",      label:"RSH Result" },
+  { key:"result-ub",       label:"UB Result" },
+  { key:"letters",         label:"Letters" },
+  { key:"letter-preview",  label:"PDF Viewer" },
+  { key:"profile",         label:"Profile" },
+  { key:"support",         label:"Help" },
+  { key:"contact",         label:"Contact" },
+  { key:"error",           label:"Error" },
+];
+
+/* ════════════════════════════════════════════
+   ROOT APP
+   ════════════════════════════════════════════ */
+const EMBED = document.documentElement.classList.contains("embed");
+
+function useFit(embed) {
+  const [k, setK] = useState(1);
+  useEffect(() => {
+    if (!embed) return;
+    const fit = () => setK(Math.min(1, (window.innerHeight - 8) / 660, (window.innerWidth - 8) / 340));
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [embed]);
+  return k;
+}
+
+function App() {
+  const [screen, setScreen] = useState("splash");
+  const fitK = useFit(EMBED);
+
+  const navigate = (next) => setScreen(next);
+
+  const renderScreen = () => {
+    switch (screen) {
+      case "splash":         return <SplashScreen navigate={navigate}/>;
+      case "welcome":        return <WelcomeScreen navigate={navigate}/>;
+      case "signin":         return <SignInScreen navigate={navigate}/>;
+      case "verify":         return <VerifyScreen navigate={navigate}/>;
+      case "verify-loading": return <VerifyLoadingScreen navigate={navigate}/>;
+      case "verify-fail":    return <VerifyFailScreen navigate={navigate}/>;
+      case "loading":        return <LoadingScreen navigate={navigate}/>;
+      case "home":           return <HomeScreen navigate={navigate}/>;
+      case "home-partial":   return <HomePartialScreen navigate={navigate}/>;
+      case "notification":   return <NotificationScreen navigate={navigate}/>;
+      case "results":        return <ResultsScreen navigate={navigate}/>;
+      case "result-rsh":     return <ResultDetailScreen navigate={navigate} title="Revelation Spiritual Home Test" score="88%" date="14 Feb 2025"/>;
+      case "result-ub":      return <ResultDetailScreen navigate={navigate} title="Ubukhosi Bomoya Test" score="91%" date="02 Mar 2025"/>;
+      case "letters":        return <LettersScreen navigate={navigate}/>;
+      case "letter-preview": return <LetterPreviewScreen navigate={navigate}/>;
+      case "profile":        return <ProfileScreen navigate={navigate}/>;
+      case "support":        return <SupportScreen navigate={navigate}/>;
+      case "contact":        return <ContactScreen navigate={navigate}/>;
+      case "error":          return <ErrorScreen navigate={navigate}/>;
+      default:               return <HomeScreen navigate={navigate}/>;
+    }
+  };
+
+  const current = ALL_SCREENS.find(s => s.key === screen);
+
+  return (
+    <div style={{ minHeight:"100vh", background: EMBED ? "transparent" : "#f0f2f7", display:"flex", flexDirection:"column",
+      alignItems:"center", justifyContent:"center", padding: EMBED ? 0 : "64px 16px 32px" }}>
+
+      {/* Header */}
+      {!EMBED && <div style={{ marginBottom:20, textAlign:"center" }}>
+        <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, color:GOLD, marginBottom:4 }}>TRSH RESULTS PORTAL</div>
+        <div style={{ fontSize:13, color:"#6b6f76" }}>
+          Interactive Prototype · <span style={{ color:NAVY, fontWeight:600 }}>{current?.label}</span>
+        </div>
+      </div>}
+
+      {/* Phone frame */}
+      <div style={{ width:320, height:640, background:"#111", borderRadius:42, padding:10,
+        boxShadow:"0 20px 60px rgba(15,29,82,.28), 0 0 0 1px rgba(255,255,255,.08)", position:"relative",
+        ...(EMBED ? { transform:`scale(${fitK})`, transformOrigin:"center center", flex:"none" } : {}) }}>
+        <div style={{ position:"absolute", top:10, left:"50%", transform:"translateX(-50%)",
+          width:90, height:18, background:"#111", borderRadius:"0 0 12px 12px", zIndex:10 }}/>
+        <div style={{ width:"100%", height:"100%", background:"#fff", borderRadius:32,
+          overflow:"hidden", display:"flex", flexDirection:"column", position:"relative" }}>
+          {renderScreen()}
+        </div>
+      </div>
+
+      {/* Jump-to pills */}
+      {!EMBED && <div style={{ marginTop:28, width:340 }}>
+        <div style={{ fontSize:11, fontWeight:700, letterSpacing:1.5, color:"#9a9da3", marginBottom:10, textAlign:"center" }}>
+          JUMP TO SCREEN
+        </div>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:6, justifyContent:"center" }}>
+          {ALL_SCREENS.map(s => (
+            <button key={s.key} onClick={() => setScreen(s.key)}
+              style={{ fontSize:10, fontWeight:600, padding:"4px 10px", borderRadius:20,
+                border:`1.5px solid ${screen===s.key ? NAVY : "#dcdfe6"}`,
+                background: screen===s.key ? NAVY : "#fff",
+                color: screen===s.key ? "#fff" : "#6b6f76",
+                cursor:"pointer", transition:"all 0.15s ease" }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>}
+
+      {!EMBED && <div style={{ marginTop:24, fontSize:11, color:"#c0c3cc" }}>
+        TRSH Results Portal · Interactive Prototype · Revelation Spiritual Home &amp; MSRI
+      </div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

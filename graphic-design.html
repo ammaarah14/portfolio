@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Graphic Design – Ammaarah Basha</title>
+<meta name="description" content="Graphic design by Ammaarah Basha: app UI, e-commerce web design, brand and poster art, presentation design, a live prototype and Figma files.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+  @font-face { font-family: "Bristol Maver"; src: url(assets/fonts/bristol-maver.woff2) format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+  :root { --black:#000; --white:#fff; --mint:#8eeeb0; --blue:#5b84ff; --paper:#e8f9f1;
+    --display:"Bristol Maver", Georgia, serif; --text:"Roboto","Helvetica Neue",Arial,sans-serif;
+    --pad:clamp(16px,2.8vw,40px); --expo:cubic-bezier(0.16,1,0.3,1); --hh:84px; }
+  *, *::before, *::after { box-sizing:border-box; }
+  html { background:#000; font-synthesis:none; scroll-behavior:smooth; }
+  body { margin:0; background:#000; color:#fff; font-family:var(--text); font-weight:700; font-size:1.0625rem; line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:clip; }
+  h1,h2,h3,p,ul,ol { margin:0; padding:0; }
+  ul,ol { list-style:none; }
+  a { color:inherit; }
+  button { font:inherit; color:inherit; }
+  :focus-visible { outline:2px solid var(--mint); outline-offset:4px; }
+  .display { font-family:var(--display); font-weight:400; font-synthesis:none; line-height:1.05; letter-spacing:0.01em; }
+  .blue { color:var(--blue); } .mint { color:var(--mint); }
+
+  /* Header */
+  .top { position:fixed; z-index:80; inset:0 0 auto 0; display:flex; align-items:center; justify-content:space-between; padding:calc(env(safe-area-inset-top,0px) + 16px) var(--pad) 0; pointer-events:none; }
+  .top > * { pointer-events:auto; }
+  .back { display:inline-flex; align-items:center; gap:12px; text-decoration:none; background:#000; color:#fff; border:1px solid rgba(142,238,176,0.55); border-radius:12px; padding:5px 18px 5px 5px; min-height:46px; font-size:0.95rem; }
+  .back span { display:grid; place-items:center; width:34px; height:34px; border-radius:8px; border:1px solid var(--mint); font-size:1.05rem; }
+  .mark { display:grid; place-items:center; width:40px; height:40px; border-radius:4px; background:#000; color:#fff; border:1px solid rgba(255,255,255,0.35); text-decoration:none; font-family:var(--display); font-weight:400; font-size:1.1rem; padding-top:2px; }
+  .progress { position:fixed; top:0; left:0; right:0; height:4px; z-index:100; pointer-events:none; }
+  .progress i { display:block; height:100%; transform-origin:0 50%; transform:scaleX(0); background:linear-gradient(90deg,var(--mint),var(--blue)); }
+
+  /* Chapter rail */
+  .rail { position:fixed; z-index:70; right:clamp(10px,1.6vw,24px); top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:6px; mix-blend-mode:difference; color:#fff; }
+  .rail a { display:flex; align-items:center; justify-content:flex-end; gap:10px; text-decoration:none; font-size:0.72rem; letter-spacing:0.06em; opacity:0.5; padding:3px 0; transition:opacity 0.5s var(--expo); }
+  .rail a b { font-weight:700; width:22px; height:2px; background:#fff; transition:width 0.6s var(--expo); }
+  .rail a em { font-style:normal; opacity:0; transform:translateX(6px); transition:opacity 0.5s var(--expo), transform 0.5s var(--expo); white-space:nowrap; }
+  .rail a:hover, .rail a.on { opacity:1; }
+  .rail a.on b { width:44px; }
+  .rail a:hover em { opacity:1; transform:none; }
+
+  /* Hero */
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:grid; grid-template-rows:1fr auto; padding:calc(var(--hh) + 20px) var(--pad) clamp(18px,2.6vw,36px); overflow:hidden; isolation:isolate; }
+  .hero::before { content:""; position:absolute; inset:0; z-index:-2; background:radial-gradient(ellipse at 20% 100%, rgba(142,238,176,0.28), transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(91,132,255,0.38), transparent 60%); }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background-image:linear-gradient(rgba(142,238,176,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(142,238,176,0.07) 1px,transparent 1px); background-size:64px 64px; -webkit-mask-image:linear-gradient(to bottom,transparent,#000 70%); mask-image:linear-gradient(to bottom,transparent,#000 70%); }
+  .hero-t { align-self:center; position:relative; }
+  .hero h1 { font-size:clamp(3.6rem,min(17vw,30vh),17rem); line-height:0.92; }
+  .hero h1 .l2 { display:block; margin-top:-0.12em; background:linear-gradient(90deg,var(--mint),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent; padding-bottom:0.08em; }
+  .shutters { position:absolute; inset:-2% -1%; display:flex; pointer-events:none; }
+  .shutters i { flex:1; background:var(--mint); transform-origin:50% 0; }
+  .shutters i:nth-child(even) { background:var(--blue); }
+  .js .shutters i { animation:shutter 1.2s var(--expo) forwards; animation-delay:calc(0.15s + var(--i) * 70ms); }
+  @keyframes shutter { to { transform:scaleY(0); } }
+  html:not(.js) .shutters { display:none; }
+  .hero-b { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:clamp(12px,1.4vw,20px); row-gap:20px; align-items:end; }
+  .hero-b p.copy { grid-column:1 / span 5; color:rgba(255,255,255,0.74); font-size:clamp(1rem,1.3vw,1.2rem); max-width:44ch; }
+  .stats { grid-column:7 / -1; display:flex; gap:clamp(16px,3vw,48px); justify-content:flex-end; flex-wrap:wrap; }
+  .stats div { border-left:2px solid var(--mint); padding-left:12px; }
+  .stats b { display:block; font-family:var(--display); font-weight:400; font-size:clamp(2rem,4vw,3.6rem); line-height:1; }
+  .stats span { font-size:0.8rem; color:rgba(255,255,255,0.65); }
+  .js .hero-b > * { opacity:0; animation:fadeUp 1.1s var(--expo) 1.0s forwards; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+
+  /* Stacking chapters */
+  .stack { position:relative; }
+  .chap { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:var(--bg); color:var(--fg); border-radius:28px 28px 0 0; box-shadow:0 -24px 60px -30px rgba(0,0,0,0.7); }
+  .chap-in { height:100%; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:clamp(20px,3vw,56px); padding:calc(var(--hh) + 8px) calc(var(--pad) + 36px) clamp(14px,2vw,26px) var(--pad); transform-origin:50% 0; will-change:transform; }
+  .shade { position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; z-index:20; }
+  .info { display:flex; flex-direction:column; min-height:0; min-width:0; }
+  .num { font-family:var(--display); font-weight:400; font-size:1rem; color:var(--ac); letter-spacing:0.08em; }
+  .info h2 { font-size:clamp(2.4rem,min(5.4vw,9vh),5.2rem); margin-top:4px; }
+  .sub { color:var(--ac); font-size:0.98rem; margin-top:6px; }
+  .desc { margin-top:clamp(10px,1.6vh,18px); font-size:clamp(0.9rem,1.05vw,1.02rem); line-height:1.5; font-weight:500; color:color-mix(in srgb, var(--fg) 76%, transparent); max-width:46ch; }
+  .tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:clamp(10px,1.6vh,16px); }
+  .tags li { border:1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius:999px; padding:4px 12px; font-size:0.78rem; }
+  .pick { margin-top:clamp(12px,2vh,22px); flex:1; min-height:0; overflow:auto; scrollbar-width:thin; display:flex; flex-direction:column; gap:2px; padding-right:6px; }
+  .pick .grp { font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--ac); margin:8px 0 2px; }
+  .pick button { all:unset; box-sizing:border-box; position:relative; isolation:isolate; display:flex; align-items:center; gap:12px; cursor:pointer; padding:7px 10px; border-radius:8px; font-size:0.92rem; overflow:hidden; color:color-mix(in srgb, var(--fg) 70%, transparent); transition:color 0.5s var(--expo); }
+  .pick button::before { content:""; position:absolute; inset:0; z-index:-1; background:var(--ac); transform:scaleX(0); transform-origin:left; transition:transform 0.7s var(--expo); }
+  .pick button i { font-style:normal; font-size:0.72rem; opacity:0.6; width:1.6em; }
+  .pick button:hover { color:var(--fg); }
+  .pick button.on { color:var(--bg); }
+  .pick button.on::before { transform:scaleX(1); }
+  .pick button:focus-visible { outline:2px solid var(--ac); outline-offset:2px; }
+
+  .stagewrap { min-height:0; min-width:0; }
+  .stage { position:relative; height:100%; border-radius:18px; overflow:hidden; background:var(--stage); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--fg) 14%, transparent); cursor:e-resize; touch-action:pan-y; }
+  .stage [data-s] { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:clamp(10px,1.6vw,22px) clamp(10px,1.6vw,22px) 58px; visibility:hidden; clip-path:inset(0 0 100% 0); }
+  .stage [data-s].on { visibility:visible; z-index:2; clip-path:inset(0); transition:clip-path 0.95s var(--expo); }
+  .stage [data-s].under { visibility:visible; z-index:1; clip-path:inset(0); }
+  .stage [data-s].from-b { visibility:visible; z-index:2; clip-path:inset(100% 0 0 0); }
+  .stage [data-s].from-t { visibility:visible; z-index:2; clip-path:inset(0 0 100% 0); }
+  .stage .cap { position:absolute; z-index:5; left:14px; right:14px; bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:12px; pointer-events:none; }
+  .stage .cl { background:var(--fg); color:var(--bg); border-radius:6px; padding:4px 10px; font-size:0.8rem; }
+  .stage .cn { font-size:0.8rem; color:color-mix(in srgb, var(--fg) 70%, transparent); margin-left:auto; margin-right:92px; }
+  .stage .nx { position:absolute; z-index:6; bottom:8px; width:38px; height:38px; border-radius:50%; cursor:pointer; border:1px solid color-mix(in srgb, var(--fg) 40%, transparent); background:color-mix(in srgb, var(--bg) 70%, transparent); display:grid; place-items:center; font-size:1.1rem; transition:background 0.4s var(--expo), color 0.4s var(--expo); }
+  .stage .nx.prev { right:56px; } .stage .nx.next { right:12px; }
+  .stage .nx:hover { background:var(--fg); color:var(--bg); }
+  .stage video[data-s] { background:#000; }
+  .priv { display:inline-flex; align-items:center; gap:8px; align-self:flex-start; margin-top:clamp(10px,1.6vh,16px); font-size:0.78rem; border-radius:999px; padding:5px 12px; background:var(--ac); color:var(--bg); }
+  .priv::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--bg); }
+
+  /* Decks: card shuffle */
+  .dkwrap { position:relative; height:100%; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+  .dk { position:relative; width:min(100%, calc((100svh - 300px) * 1.7778)); aspect-ratio:16/9; margin:0 auto; }
+  .dk[hidden] { display:none; }
+  .dk .card { position:absolute; inset:0; border-radius:14px; overflow:hidden; background:#fff; cursor:pointer; box-shadow:0 0 0 1px rgba(0,0,0,0.12), 0 24px 50px -24px rgba(0,0,0,0.55);
+    z-index:calc(50 - var(--o)); transform:translate(calc(var(--o) * 22px), calc(var(--o) * -16px)) rotate(calc(var(--o) * 1.6deg)) scale(calc(1 - var(--o) * 0.03)); transform-origin:50% 100%;
+    transition:transform 0.8s var(--expo), opacity 0.6s var(--expo); }
+  .dk .card.far { opacity:0; pointer-events:none; }
+  .dk .card.fly { transform:translate(-118%, 8%) rotate(-14deg); transition:transform 0.55s cubic-bezier(0.5,0,0.75,0); z-index:80; }
+  .dk .card.nt { transition:none !important; }
+  .dk .card img { display:block; width:100%; height:100%; object-fit:cover; }
+  .dkctl { display:flex; align-items:center; gap:14px; margin:clamp(18px,3vh,34px) auto 0; width:min(100%, calc((100svh - 300px) * 1.7778)); }
+  .dkctl .nx { width:42px; height:42px; border-radius:50%; cursor:pointer; background:transparent; border:1px solid rgba(0,0,0,0.4); font-size:1.15rem; display:grid; place-items:center; transition:background 0.4s var(--expo), color 0.4s var(--expo); }
+  .dkctl .nx:hover { background:#000; color:#fff; }
+  .dkctl .dn { margin-left:auto; font-size:0.9rem; }
+  .dkctl .dt { font-size:0.9rem; color:rgba(0,0,0,0.65); }
+
+  /* Prototype chapter */
+  .protoview { display:grid; place-items:center; min-height:0; position:relative; }
+  .phone { position:relative; height:min(100%, 640px); aspect-ratio:9/18.5; border-radius:38px; padding:12px; background:#06103a; box-shadow:0 0 0 2px rgba(201,162,39,0.55), 0 40px 80px -30px rgba(0,0,0,0.8), 0 0 120px -20px rgba(37,65,178,0.8); animation:float 7s ease-in-out infinite; }
+  .protoview iframe { position:absolute; inset:0; width:100%; height:100%; border:0; background:#0F1D52; border-radius:18px; z-index:2; }
+  .protoview.live .phone { display:none; }
+  @keyframes float { 50% { transform:translateY(-12px) rotate(0.6deg); } }
+  .phone .scr { height:100%; border-radius:28px; overflow:hidden; background:linear-gradient(180deg,#0F1D52,#2541B2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; padding:20px; position:relative; }
+  .phone .scr b { font-family:"Source Serif 4",Georgia,serif; font-size:1.3rem; letter-spacing:0.02em; }
+  .phone .scr small { color:#E8C766; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; }
+  .phone .ln { width:70%; height:9px; border-radius:6px; background:rgba(255,255,255,0.16); }
+  .phone .ln.s { width:46%; }
+  .phone .pill { margin-top:6px; background:#C9A227; color:#0F1D52; border-radius:999px; padding:8px 20px; font-size:0.78rem; }
+  .phone .scr::after { content:""; position:absolute; left:-30%; right:-30%; top:-60%; height:60%; background:linear-gradient(180deg,transparent,rgba(232,199,102,0.22),transparent); animation:scan 4.5s linear infinite; }
+  @keyframes scan { to { transform:translateY(300%); } }
+  .btnx { position:relative; isolation:isolate; display:inline-flex; align-items:center; justify-content:space-between; gap:14px; overflow:hidden; border-radius:12px; min-height:50px; background:#fff; color:#000; text-decoration:none; padding:0 18px 0 6px; margin-top:clamp(14px,2.4vh,26px); align-self:flex-start; }
+  .btnx::after { content:""; position:absolute; inset:0; z-index:-1; background:var(--ac); transform:scaleY(0); transform-origin:top; transition:transform 0.6s var(--expo); }
+  .btnx:hover::after, .btnx:focus-visible::after { transform:scaleY(1); transform-origin:bottom; }
+  .btnx .ico { width:38px; height:38px; border-radius:9px; background:#000; color:#fff; display:grid; place-items:center; border:1px solid var(--ac); }
+  .note { margin-top:10px; font-size:0.78rem; color:color-mix(in srgb, var(--fg) 60%, transparent); font-weight:500; }
+
+  /* Figma index */
+  .figma { position:relative; z-index:60; background:var(--mint); color:#000; border-radius:28px 28px 0 0; padding:clamp(40px,6vw,90px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 24px); min-height:100svh; display:flex; flex-direction:column; box-shadow:0 -24px 60px -30px rgba(0,0,0,0.7); }
+  .figma-h { display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:clamp(16px,3vw,56px); align-items:end; margin-bottom:clamp(20px,3vw,44px); }
+  .figma-h h2 { font-size:clamp(2.6rem,7vw,6.4rem); }
+  .figma-h p { max-width:46ch; font-weight:500; }
+  .rows { border-top:2px solid #000; }
+  .row { position:relative; isolation:isolate; display:grid; grid-template-columns:3.2rem 1fr auto; align-items:center; gap:12px; padding:clamp(12px,1.7vw,20px) 6px; border-bottom:1px solid rgba(0,0,0,0.35); text-decoration:none; overflow:hidden; transition:color 0.5s var(--expo); }
+  .row::before { content:""; position:absolute; inset:0; z-index:-1; background:#000; transform:scaleX(0); transform-origin:left; transition:transform 0.7s var(--expo); }
+  .row:hover, .row:focus-visible { color:#fff; }
+  .row:hover::before, .row:focus-visible::before { transform:scaleX(1); }
+  .row .rn { font-size:0.85rem; opacity:0.6; padding-left:6px; }
+  .row .nm { font-family:var(--display); font-weight:400; font-size:clamp(1.4rem,3vw,2.6rem); line-height:1.1; transition:transform 0.7s var(--expo); }
+  .row:hover .nm, .row:focus-visible .nm { transform:translateX(18px); }
+  .row .go { display:inline-flex; align-items:center; gap:10px; font-size:0.9rem; padding-right:6px; }
+  .row .go svg { transition:transform 0.7s var(--expo); }
+  .row:hover .go svg, .row:focus-visible .go svg { transform:rotate(45deg); }
+  .foot { margin-top:auto; padding-top:clamp(28px,4vw,56px); display:flex; flex-wrap:wrap; gap:14px 28px; justify-content:space-between; align-items:center; font-size:0.95rem; }
+  .foot a { text-underline-offset:4px; }
+
+  /* Mobile / small */
+  @media (max-width:900px) {
+    .rail { display:none; }
+    .hero-b p.copy { grid-column:1 / -1; } .stats { grid-column:1 / -1; justify-content:flex-start; }
+    .chap { position:relative; height:auto; border-radius:22px 22px 0 0; margin-top:-22px; }
+    .chap:first-child { margin-top:0; }
+    .chap-in { grid-template-columns:minmax(0,1fr); height:auto; padding:calc(var(--hh) - 14px) var(--pad) 52px; }
+    .stagewrap { height:74vh; height:74svh; }
+    .pick { flex-direction:row; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; padding:0 0 6px; flex:none; }
+    .pick .grp { display:none; }
+    .pick button { flex:none; white-space:nowrap; }
+    .dk, .dkctl { width:100%; }
+    .dkwrap { height:auto; padding:8px 26px 0 0; }
+    .protoview { height:70vh; padding:20px 0; }
+    .phone { height:100%; }
+    .figma { border-radius:22px 22px 0 0; margin-top:-22px; }
+    .figma-h { grid-template-columns:minmax(0,1fr); }
+    .hero h1 { font-size:clamp(3.6rem,22vw,9rem); }
+    .row { grid-template-columns:2.4rem 1fr auto; } .row .go span { display:none; }
+    .shade { display:none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    .shutters { display:none; }
+    .js .hero-b > * { opacity:1; animation:none; }
+    .phone, .phone .scr::after { animation:none; }
+    .stage [data-s].on { transition:none; }
+    .dk .card, .dk .card.fly { transition:none; }
+    .progress { display:none; }
+  }
+
+/* custom arrow icons */
+.ar{width:1.2em;height:1.2em;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;overflow:visible;vertical-align:-0.22em;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.ar.l{transform:scaleX(-1)}
+:is(a,button):is(:hover,:focus-visible) .ar{transform:translateX(4px)}
+:is(a,button):is(:hover,:focus-visible) .ar.l{transform:translateX(-4px) scaleX(-1)}
+@media (prefers-reduced-motion:reduce){.ar{transition:none}}
+/* cursor halo */
+.cur{position:fixed;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;pointer-events:none;z-index:2147483000;opacity:0;
+  background:rgba(var(--cc,142,238,176),.13);border:1px solid rgba(var(--cc,142,238,176),.4);box-shadow:0 0 18px rgba(var(--cc,142,238,176),.16);
+  transition:opacity .3s, width .4s cubic-bezier(.16,1,.3,1), height .4s cubic-bezier(.16,1,.3,1), margin .4s cubic-bezier(.16,1,.3,1), background-color .4s, border-color .4s, box-shadow .4s;will-change:transform}
+.cur.on{opacity:1}
+.cur.hot{width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(var(--cc,142,238,176),.09)}
+.cur.dn{width:22px;height:22px;margin:-11px 0 0 -11px;background:rgba(var(--cc,142,238,176),.22)}
+@media (hover:none),(pointer:coarse){.cur{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<header class="top">
+  <a class="back" href="index.html#work"><span aria-hidden="true"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></span>Back to portfolio</a>
+  <a class="mark" href="index.html" aria-label="Ammaarah Basha, home">AB</a>
+</header>
+
+<nav class="rail" id="rail" aria-label="Chapters">
+  <a href="#lofts" aria-label="Samuel Lofts"><em>Samuel Lofts</em><span>01</span><b></b></a><a href="#ubuntu" aria-label="Ubuntu Clothing"><em>Ubuntu Clothing</em><span>02</span><b></b></a><a href="#lxnexus" aria-label="LX Nexus"><em>LX Nexus</em><span>03</span><b></b></a><a href="#brand" aria-label="Brand & poster"><em>Brand &amp; poster</em><span>04</span><b></b></a><a href="#decks" aria-label="Presentations"><em>Presentations</em><span>05</span><b></b></a><a href="#prototype" aria-label="Live prototype"><em>Live prototype</em><span>06</span><b></b></a><a href="#game" aria-label="Mini game"><em>Mini game</em><span>07</span><b></b></a><a href="#figma" aria-label="Figma files"><em>Figma files</em><span>08</span><b></b></a>
+</nav>
+
+<main>
+  <section class="hero" id="top" aria-label="Graphic design introduction">
+    <div class="hero-t">
+      <h1 class="display">Graphic<span class="l2">design</span></h1>
+      <div class="shutters" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></div>
+    </div>
+    <div class="hero-b">
+      <p class="copy">Interfaces, web pages, brand marks, posters and slide decks. This is where my love of art meets software: designing how things look, and how they feel to use.</p>
+      <div class="stats">
+        <div><b>5</b><span>design projects</span></div>
+        <div><b>1</b><span>live prototype</span></div>
+        <div><b>1</b><span>game preview</span></div>
+        <div><b>11</b><span>Figma files</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stack" id="stack">
+    <section class="chap" id="lofts" data-gallery aria-label="Samuel Lofts" style="--bg:#1d1411;--fg:#f3e6d8;--ac:#e8a15c;--stage:#2a1c16">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">01</p>
+          <h2 class="display">Samuel Lofts</h2>
+          <p class="sub">Pigeon Management System · App UI</p>
+          <p class="desc">A management system for a pigeon loft, designed as an app. Dashboards for rooms, breeding rounds, health records, pedigree and race performance, explored in two moods: a dark, textured theme and a soft, light one.</p>
+          <ul class="tags"><li>UI design</li><li>Dashboards</li><li>Dark &amp; light themes</li></ul>
+          <div class="pick" role="group" aria-label="Choose a screen"><p class="grp">Dark theme</p><button type="button" data-label="Loft view" aria-pressed="true" class="on"><i>01</i>Loft view</button><button type="button" data-label="Performance records" aria-pressed="false" class=""><i>02</i>Performance records</button><button type="button" data-label="Pedigree viewer" aria-pressed="false" class=""><i>03</i>Pedigree viewer</button><button type="button" data-label="Tracking module" aria-pressed="false" class=""><i>04</i>Tracking module</button><button type="button" data-label="Health module" aria-pressed="false" class=""><i>05</i>Health module</button><button type="button" data-label="Racing module" aria-pressed="false" class=""><i>06</i>Racing module</button><button type="button" data-label="Reports" aria-pressed="false" class=""><i>07</i>Reports</button><p class="grp">Light theme</p><button type="button" data-label="Dashboard" aria-pressed="false" class=""><i>08</i>Dashboard</button><button type="button" data-label="Health records" aria-pressed="false" class=""><i>09</i>Health records</button><button type="button" data-label="Loft view" aria-pressed="false" class=""><i>10</i>Loft view</button></div>
+        </div>
+        <div class="stagewrap">
+          <div class="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Samuel Lofts screens. Use arrow keys to move between them.">
+            <img data-s class="on" alt="Loft view" decoding="async" src="assets/design-001.webp"><img data-s alt="Performance records" decoding="async" src="assets/design-002.webp"><img data-s alt="Pedigree viewer" decoding="async" src="assets/design-003.webp"><img data-s alt="Tracking module" decoding="async" src="assets/design-004.webp"><img data-s alt="Health module" decoding="async" src="assets/design-005.webp"><img data-s alt="Racing module" decoding="async" src="assets/design-006.webp"><img data-s alt="Reports" decoding="async" src="assets/design-007.webp"><img data-s alt="Dashboard" decoding="async" src="assets/design-008.webp"><img data-s alt="Health records" decoding="async" src="assets/design-009.webp"><img data-s alt="Loft view" decoding="async" src="assets/design-010.webp">
+            <div class="cap"><span class="cl">Loft view</span><span class="cn">1 / 10</span></div>
+            <button type="button" class="nx prev" aria-label="Previous screen"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+            <button type="button" class="nx next" aria-label="Next screen"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="ubuntu" data-gallery aria-label="Ubuntu Clothing" style="--bg:#f1ebe1;--fg:#1a1a1a;--ac:#8a6a43;--stage:#e2d8c8">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">02</p>
+          <h2 class="display">Ubuntu Clothing</h2>
+          <p class="sub">E-commerce · Web design</p>
+          <p class="desc">An online store for a minimal clothing brand: category pages for men, women, kids and accessories, a cart, an About page and a payment and shipping page. A neutral palette and generous whitespace let the product photography do the talking.</p>
+          <ul class="tags"><li>Web design</li><li>E-commerce</li><li>Layout &amp; grid</li></ul>
+          <div class="pick" role="group" aria-label="Choose a screen"><button type="button" data-label="Men" aria-pressed="true" class="on"><i>01</i>Men</button><button type="button" data-label="Women" aria-pressed="false" class=""><i>02</i>Women</button><button type="button" data-label="Kids" aria-pressed="false" class=""><i>03</i>Kids</button><button type="button" data-label="Accessories" aria-pressed="false" class=""><i>04</i>Accessories</button><button type="button" data-label="Cart" aria-pressed="false" class=""><i>05</i>Cart</button><button type="button" data-label="About" aria-pressed="false" class=""><i>06</i>About</button><button type="button" data-label="Payment &amp; shipping" aria-pressed="false" class=""><i>07</i>Payment &amp; shipping</button></div>
+        </div>
+        <div class="stagewrap">
+          <div class="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Ubuntu Clothing screens. Use arrow keys to move between them.">
+            <img data-s class="on" alt="Men" decoding="async" src="assets/design-011.webp"><img data-s alt="Women" decoding="async" src="assets/design-012.webp"><img data-s alt="Kids" decoding="async" src="assets/design-013.webp"><img data-s alt="Accessories" decoding="async" src="assets/design-014.webp"><img data-s alt="Cart" decoding="async" src="assets/design-015.webp"><img data-s alt="About" decoding="async" src="assets/design-016.webp"><img data-s alt="Payment &amp; shipping" decoding="async" src="assets/design-017.webp">
+            <div class="cap"><span class="cl">Men</span><span class="cn">1 / 7</span></div>
+            <button type="button" class="nx prev" aria-label="Previous screen"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+            <button type="button" class="nx next" aria-label="Next screen"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="lxnexus" data-gallery aria-label="LX Nexus" style="--bg:#06142b;--fg:#e6f1ff;--ac:#e5b657;--stage:#0a2447">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">03</p>
+          <h2 class="display">LX Nexus</h2>
+          <p class="sub">AI company · Web concept</p>
+          <p class="desc">A concept website for an AI solutions company. A glowing dark-blue visual language, a hero built around a glass-globe illustration, benefit cards, and a matching mobile layout.</p>
+          <ul class="tags"><li>Web concept</li><li>Responsive</li><li>Dark UI</li></ul>
+          <div class="pick" role="group" aria-label="Choose a screen"><button type="button" data-label="Landing page" aria-pressed="true" class="on"><i>01</i>Landing page</button><button type="button" data-label="Hero &amp; benefits" aria-pressed="false" class=""><i>02</i>Hero &amp; benefits</button><button type="button" data-label="Mobile layout" aria-pressed="false" class=""><i>03</i>Mobile layout</button></div>
+        </div>
+        <div class="stagewrap">
+          <div class="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="LX Nexus screens. Use arrow keys to move between them.">
+            <img data-s class="on" alt="Landing page" decoding="async" src="assets/design-018.webp"><img data-s alt="Hero &amp; benefits" decoding="async" src="assets/design-019.webp"><img data-s alt="Mobile layout" decoding="async" src="assets/design-020.webp">
+            <div class="cap"><span class="cl">Landing page</span><span class="cn">1 / 3</span></div>
+            <button type="button" class="nx prev" aria-label="Previous screen"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+            <button type="button" class="nx next" aria-label="Next screen"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="brand" data-gallery aria-label="Brand &amp; poster art" style="--bg:#0c0c0c;--fg:#ffffff;--ac:#8eeeb0;--stage:#171717">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">04</p>
+          <h2 class="display">Brand &amp; poster art</h2>
+          <p class="sub">Logos · Posters · Banners</p>
+          <p class="desc">Logos, posters and one-offs: the STATIC wordmark, a collage poster called The Potential of Us, a coming-soon graphic, the Lexxis logo, my animated GitHub banner and a Ferrari-themed layout.</p>
+          <ul class="tags"><li>Logo design</li><li>Posters</li><li>Animated banner</li></ul>
+          <div class="pick" role="group" aria-label="Choose a screen"><button type="button" data-label="STATIC · wordmark" aria-pressed="true" class="on"><i>01</i>STATIC · wordmark</button><button type="button" data-label="STATIC · loader" aria-pressed="false" class=""><i>02</i>STATIC · loader</button><button type="button" data-label="The Potential of Us · I" aria-pressed="false" class=""><i>03</i>The Potential of Us · I</button><button type="button" data-label="The Potential of Us · II" aria-pressed="false" class=""><i>04</i>The Potential of Us · II</button><button type="button" data-label="Coming soon" aria-pressed="false" class=""><i>05</i>Coming soon</button><button type="button" data-label="Lexxis logo" aria-pressed="false" class=""><i>06</i>Lexxis logo</button><button type="button" data-label="GitHub banner (animated)" aria-pressed="false" class=""><i>07</i>GitHub banner (animated)</button><button type="button" data-label="Ferrari layout" aria-pressed="false" class=""><i>08</i>Ferrari layout</button></div>
+        </div>
+        <div class="stagewrap">
+          <div class="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Brand &amp; poster art screens. Use arrow keys to move between them.">
+            <img data-s class="on" alt="STATIC · wordmark" decoding="async" src="assets/design-021.webp"><img data-s alt="STATIC · loader" decoding="async" src="assets/design-022.webp"><img data-s alt="The Potential of Us · I" decoding="async" src="assets/design-023.webp"><img data-s alt="The Potential of Us · II" decoding="async" src="assets/design-024.webp"><img data-s alt="Coming soon" decoding="async" src="assets/design-025.webp"><img data-s alt="Lexxis logo" decoding="async" src="assets/design-026.webp"><img data-s alt="GitHub banner (animated)" decoding="async" src="assets/design-027.webp"><img data-s alt="Ferrari layout" decoding="async" src="assets/design-028.webp">
+            <div class="cap"><span class="cl">STATIC · wordmark</span><span class="cn">1 / 8</span></div>
+            <button type="button" class="nx prev" aria-label="Previous screen"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+            <button type="button" class="nx next" aria-label="Next screen"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="decks" aria-label="Presentation design" style="--bg:#e8f9f1;--fg:#000;--ac:#5b84ff;--stage:#fff">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">05</p>
+          <h2 class="display">Presentation design</h2>
+          <p class="sub">Slide decks · Teaching, reporting &amp; product</p>
+          <p class="desc">Ten slide decks across different briefs: bright, illustrated decks for explaining code, a dark data-led report on code health, a professionalism training deck, and a family of LX Nexus product decks (Nova, Drift and Titan) each with its own colour world. Click a deck, or use the arrows, to shuffle through the slides.</p>
+          <ul class="tags"><li>Slide design</li><li>Layout</li><li>Illustration</li></ul>
+          <div class="pick" role="group" aria-label="Choose a deck"><p class="grp">Teaching &amp; reporting</p><button type="button" data-deck-tab data-title="Python Operations Made Easy" aria-pressed="true" class="on"><i>01</i>Python Operations Made Easy<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="Iterative Code Health Improvements" aria-pressed="false" class=""><i>02</i>Iterative Code Health Improvements<small style="margin-left:auto;opacity:.7;font-weight:500">6 slides</small></button><button type="button" data-deck-tab data-title="Python Operations Made Easy (bold take)" aria-pressed="false" class=""><i>03</i>Python Operations Made Easy (bold take)<small style="margin-left:auto;opacity:.7;font-weight:500">2 slides</small></button><button type="button" data-deck-tab data-title="Professionalism" aria-pressed="false" class=""><i>04</i>Professionalism<small style="margin-left:auto;opacity:.7;font-weight:500">21 slides</small></button><p class="grp">LX Nexus product decks</p><button type="button" data-deck-tab data-title="Light the Future" aria-pressed="false" class=""><i>05</i>Light the Future<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="Nova: Light the Future" aria-pressed="false" class=""><i>06</i>Nova: Light the Future<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="Drift: The Future" aria-pressed="false" class=""><i>07</i>Drift: The Future<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="The Future in Motion" aria-pressed="false" class=""><i>08</i>The Future in Motion<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="Drift: The Future in Motion" aria-pressed="false" class=""><i>09</i>Drift: The Future in Motion<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button><button type="button" data-deck-tab data-title="The Power of Precision" aria-pressed="false" class=""><i>10</i>The Power of Precision<small style="margin-left:auto;opacity:.7;font-weight:500">10 slides</small></button></div>
+        </div>
+        <div class="dkwrap" id="dkwrap" tabindex="0" aria-label="Slide deck. Use left and right arrow keys to move between slides.">
+          <div class="dk" data-deck="ops"><div class="card" style="--o:0"><img alt="Python Operations Made Easy, slide 1" decoding="async" src="assets/design-029.webp"></div><div class="card" style="--o:1"><img alt="Python Operations Made Easy, slide 2" decoding="async" src="assets/design-030.webp"></div><div class="card" style="--o:2"><img alt="Python Operations Made Easy, slide 3" decoding="async" src="assets/design-031.webp"></div><div class="card" style="--o:3"><img alt="Python Operations Made Easy, slide 4" decoding="async" src="assets/design-032.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 5" decoding="async" src="assets/design-033.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 6" decoding="async" src="assets/design-034.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 7" decoding="async" src="assets/design-035.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 8" decoding="async" src="assets/design-036.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 9" decoding="async" src="assets/design-037.webp"></div><div class="card" style="--o:4"><img alt="Python Operations Made Easy, slide 10" decoding="async" src="assets/design-038.webp"></div></div><div class="dk" data-deck="ich" hidden><div class="card" style="--o:0"><img alt="Iterative Code Health Improvements, slide 1" decoding="async" src="assets/design-039.webp"></div><div class="card" style="--o:1"><img alt="Iterative Code Health Improvements, slide 2" decoding="async" src="assets/design-040.webp"></div><div class="card" style="--o:2"><img alt="Iterative Code Health Improvements, slide 3" decoding="async" src="assets/design-041.webp"></div><div class="card" style="--o:3"><img alt="Iterative Code Health Improvements, slide 4" decoding="async" src="assets/design-042.webp"></div><div class="card" style="--o:4"><img alt="Iterative Code Health Improvements, slide 5" decoding="async" src="assets/design-043.webp"></div><div class="card" style="--o:4"><img alt="Iterative Code Health Improvements, slide 6" decoding="async" src="assets/design-044.webp"></div></div><div class="dk" data-deck="opx" hidden><div class="card" style="--o:0"><img alt="Python Operations Made Easy (bold take), slide 1" decoding="async" src="assets/design-045.webp"></div><div class="card" style="--o:1"><img alt="Python Operations Made Easy (bold take), slide 2" decoding="async" src="assets/design-046.webp"></div></div>
+          <div class="dk" data-deck="prof" hidden><div class="card" style="--o:0"><img alt="Professionalism, slide 1" decoding="async" loading="lazy" src="assets/design-047.webp"></div><div class="card" style="--o:1"><img alt="Professionalism, slide 2" decoding="async" loading="lazy" src="assets/design-048.webp"></div><div class="card" style="--o:2"><img alt="Professionalism, slide 3" decoding="async" loading="lazy" src="assets/design-049.webp"></div><div class="card" style="--o:3"><img alt="Professionalism, slide 4" decoding="async" loading="lazy" src="assets/design-050.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 5" decoding="async" loading="lazy" src="assets/design-051.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 6" decoding="async" loading="lazy" src="assets/design-052.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 7" decoding="async" loading="lazy" src="assets/design-053.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 8" decoding="async" loading="lazy" src="assets/design-054.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 9" decoding="async" loading="lazy" src="assets/design-055.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 10" decoding="async" loading="lazy" src="assets/design-056.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 11" decoding="async" loading="lazy" src="assets/design-057.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 12" decoding="async" loading="lazy" src="assets/design-058.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 13" decoding="async" loading="lazy" src="assets/design-059.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 14" decoding="async" loading="lazy" src="assets/design-060.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 15" decoding="async" loading="lazy" src="assets/design-061.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 16" decoding="async" loading="lazy" src="assets/design-062.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 17" decoding="async" loading="lazy" src="assets/design-063.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 18" decoding="async" loading="lazy" src="assets/design-064.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 19" decoding="async" loading="lazy" src="assets/design-065.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 20" decoding="async" loading="lazy" src="assets/design-066.webp"></div><div class="card" style="--o:4"><img alt="Professionalism, slide 21" decoding="async" loading="lazy" src="assets/design-067.webp"></div></div><div class="dk" data-deck="light" hidden><div class="card" style="--o:0"><img alt="Light the Future, slide 1" decoding="async" loading="lazy" src="assets/design-068.webp"></div><div class="card" style="--o:1"><img alt="Light the Future, slide 2" decoding="async" loading="lazy" src="assets/design-069.webp"></div><div class="card" style="--o:2"><img alt="Light the Future, slide 3" decoding="async" loading="lazy" src="assets/design-070.webp"></div><div class="card" style="--o:3"><img alt="Light the Future, slide 4" decoding="async" loading="lazy" src="assets/design-071.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 5" decoding="async" loading="lazy" src="assets/design-072.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 6" decoding="async" loading="lazy" src="assets/design-073.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 7" decoding="async" loading="lazy" src="assets/design-074.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 8" decoding="async" loading="lazy" src="assets/design-075.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 9" decoding="async" loading="lazy" src="assets/design-076.webp"></div><div class="card" style="--o:4"><img alt="Light the Future, slide 10" decoding="async" loading="lazy" src="assets/design-077.webp"></div></div><div class="dk" data-deck="nova" hidden><div class="card" style="--o:0"><img alt="Nova: Light the Future, slide 1" decoding="async" loading="lazy" src="assets/design-078.webp"></div><div class="card" style="--o:1"><img alt="Nova: Light the Future, slide 2" decoding="async" loading="lazy" src="assets/design-079.webp"></div><div class="card" style="--o:2"><img alt="Nova: Light the Future, slide 3" decoding="async" loading="lazy" src="assets/design-080.webp"></div><div class="card" style="--o:3"><img alt="Nova: Light the Future, slide 4" decoding="async" loading="lazy" src="assets/design-081.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 5" decoding="async" loading="lazy" src="assets/design-082.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 6" decoding="async" loading="lazy" src="assets/design-083.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 7" decoding="async" loading="lazy" src="assets/design-084.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 8" decoding="async" loading="lazy" src="assets/design-085.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 9" decoding="async" loading="lazy" src="assets/design-086.webp"></div><div class="card" style="--o:4"><img alt="Nova: Light the Future, slide 10" decoding="async" loading="lazy" src="assets/design-087.webp"></div></div><div class="dk" data-deck="future" hidden><div class="card" style="--o:0"><img alt="Drift: The Future, slide 1" decoding="async" loading="lazy" src="assets/design-088.webp"></div><div class="card" style="--o:1"><img alt="Drift: The Future, slide 2" decoding="async" loading="lazy" src="assets/design-089.webp"></div><div class="card" style="--o:2"><img alt="Drift: The Future, slide 3" decoding="async" loading="lazy" src="assets/design-090.webp"></div><div class="card" style="--o:3"><img alt="Drift: The Future, slide 4" decoding="async" loading="lazy" src="assets/design-091.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 5" decoding="async" loading="lazy" src="assets/design-092.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 6" decoding="async" loading="lazy" src="assets/design-093.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 7" decoding="async" loading="lazy" src="assets/design-094.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 8" decoding="async" loading="lazy" src="assets/design-095.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 9" decoding="async" loading="lazy" src="assets/design-096.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future, slide 10" decoding="async" loading="lazy" src="assets/design-097.webp"></div></div><div class="dk" data-deck="fim" hidden><div class="card" style="--o:0"><img alt="The Future in Motion, slide 1" decoding="async" loading="lazy" src="assets/design-098.webp"></div><div class="card" style="--o:1"><img alt="The Future in Motion, slide 2" decoding="async" loading="lazy" src="assets/design-099.webp"></div><div class="card" style="--o:2"><img alt="The Future in Motion, slide 3" decoding="async" loading="lazy" src="assets/design-100.webp"></div><div class="card" style="--o:3"><img alt="The Future in Motion, slide 4" decoding="async" loading="lazy" src="assets/design-101.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 5" decoding="async" loading="lazy" src="assets/design-102.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 6" decoding="async" loading="lazy" src="assets/design-103.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 7" decoding="async" loading="lazy" src="assets/design-104.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 8" decoding="async" loading="lazy" src="assets/design-105.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 9" decoding="async" loading="lazy" src="assets/design-106.webp"></div><div class="card" style="--o:4"><img alt="The Future in Motion, slide 10" decoding="async" loading="lazy" src="assets/design-107.webp"></div></div><div class="dk" data-deck="drift" hidden><div class="card" style="--o:0"><img alt="Drift: The Future in Motion, slide 1" decoding="async" loading="lazy" src="assets/design-108.webp"></div><div class="card" style="--o:1"><img alt="Drift: The Future in Motion, slide 2" decoding="async" loading="lazy" src="assets/design-109.webp"></div><div class="card" style="--o:2"><img alt="Drift: The Future in Motion, slide 3" decoding="async" loading="lazy" src="assets/design-110.webp"></div><div class="card" style="--o:3"><img alt="Drift: The Future in Motion, slide 4" decoding="async" loading="lazy" src="assets/design-111.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 5" decoding="async" loading="lazy" src="assets/design-112.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 6" decoding="async" loading="lazy" src="assets/design-113.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 7" decoding="async" loading="lazy" src="assets/design-114.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 8" decoding="async" loading="lazy" src="assets/design-115.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 9" decoding="async" loading="lazy" src="assets/design-116.webp"></div><div class="card" style="--o:4"><img alt="Drift: The Future in Motion, slide 10" decoding="async" loading="lazy" src="assets/design-117.webp"></div></div><div class="dk" data-deck="prec" hidden><div class="card" style="--o:0"><img alt="The Power of Precision, slide 1" decoding="async" loading="lazy" src="assets/design-118.webp"></div><div class="card" style="--o:1"><img alt="The Power of Precision, slide 2" decoding="async" loading="lazy" src="assets/design-119.webp"></div><div class="card" style="--o:2"><img alt="The Power of Precision, slide 3" decoding="async" loading="lazy" src="assets/design-120.webp"></div><div class="card" style="--o:3"><img alt="The Power of Precision, slide 4" decoding="async" loading="lazy" src="assets/design-121.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 5" decoding="async" loading="lazy" src="assets/design-122.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 6" decoding="async" loading="lazy" src="assets/design-123.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 7" decoding="async" loading="lazy" src="assets/design-124.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 8" decoding="async" loading="lazy" src="assets/design-125.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 9" decoding="async" loading="lazy" src="assets/design-126.webp"></div><div class="card" style="--o:4"><img alt="The Power of Precision, slide 10" decoding="async" loading="lazy" src="assets/design-127.webp"></div></div>
+          <div class="dkctl"><button type="button" class="nx" id="dkPrev" aria-label="Previous slide"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button><button type="button" class="nx" id="dkNext" aria-label="Next slide"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button><span class="dt" id="dt"></span><span class="dn" id="dn"></span></div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="prototype" aria-label="Live prototype" style="--bg:#0F1D52;--fg:#ffffff;--ac:#C9A227;--stage:#0F1D52">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">06</p>
+          <h2 class="display">TRSH Results Portal</h2>
+          <p class="sub">Live interactive prototype</p>
+          <p class="desc">A working prototype of a member results portal that I built as an HTML file. You can tap through the whole journey: splash and sign-in, identity verification (including failure states), results and result details, official letters, profile, support and contact. 18 connected screens in all.</p>
+          <ul class="tags"><li>Prototype</li><li>Mobile UI</li><li>HTML · React</li></ul>
+          <a class="btnx" href="trsh-prototype.html" target="_blank" rel="noopener"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span><span>Open full screen</span></a>
+          <p class="note">Try it right here in the phone, or open it full screen in a new tab. Needs an internet connection to load.</p>
+        </div>
+        <div class="protoview">
+          <iframe src="trsh-prototype.html?embed=1" title="TRSH Results Portal interactive prototype" loading="lazy" onload="this.parentNode.classList.add('live')"></iframe>
+          <div class="phone" aria-hidden="true"><div class="scr"><svg viewBox="0 0 100 100" width="84" height="84"><circle cx="50" cy="50" r="47" fill="none" stroke="#C9A227" stroke-width="2"/><circle cx="50" cy="50" r="40" fill="none" stroke="#C9A227" stroke-width="1"/><circle cx="50" cy="50" r="34" fill="#0F1D52"/><path d="M50 32 L58 48 L50 68 L42 48 Z" fill="#C9A227"/></svg><b>TRSH Results Portal</b><small>Member access</small><div class="ln"></div><div class="ln s"></div><span class="pill">Sign in</span></div></div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="chap" id="game" data-gallery aria-label="Game development" style="--bg:#101a14;--fg:#eef3e6;--ac:#a6d96e;--stage:#182519">
+      <div class="chap-in">
+        <div class="info">
+          <p class="num">07</p>
+          <h2 class="display">Game development</h2>
+          <p class="sub">Godot · GDScript · Private personal project</p>
+          <p class="desc">A small preview of a private personal project I built to learn Godot and GDScript. Every asset was created by me, including the character, her expressions, the scenery and the props, and I learned how to make animated sprites along the way. The result is a fully working mini game: the character walks through different levels, interacts with objects and finishes with a short pop quiz. I also learned how to publish a game on itch.io.</p>
+          <ul class="tags"><li>Godot</li><li>GDScript</li><li>Sprite animation</li><li>Level design</li><li>itch.io</li></ul>
+          <span class="priv">Private project · preview only</span>
+          <div class="pick" role="group" aria-label="Choose an item"><button type="button" data-label="Gameplay clip" aria-pressed="true" class="on"><i>01</i>Gameplay clip</button><button type="button" data-label="Opening dialogue" aria-pressed="false" class=""><i>02</i>Opening dialogue</button><button type="button" data-label="Opening scene" aria-pressed="false" class=""><i>03</i>Opening scene</button><button type="button" data-label="Character expressions" aria-pressed="false" class=""><i>04</i>Character expressions</button><button type="button" data-label="Level · Quiet street &amp; house" aria-pressed="false" class=""><i>05</i>Level · Quiet street &amp; house</button><button type="button" data-label="Level · Rainy city street" aria-pressed="false" class=""><i>06</i>Level · Rainy city street</button><button type="button" data-label="Pop-up item · Keys" aria-pressed="false" class=""><i>07</i>Pop-up item · Keys</button></div>
+        </div>
+        <div class="stagewrap">
+          <div class="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Game preview. Use arrow keys to move between items.">
+            <video data-s class="on" controls playsinline preload="metadata" aria-label="Gameplay clip" poster="assets/design-128.jpg" src="wlc-gameplay.mp4"></video><img data-s alt="Opening dialogue" decoding="async" src="assets/design-129.webp"><img data-s alt="Opening scene" decoding="async" src="assets/design-130.webp"><img data-s alt="Character expressions" decoding="async" src="assets/design-131.webp"><img data-s alt="Level · Quiet street &amp; house" decoding="async" src="assets/design-132.webp"><img data-s alt="Level · Rainy city street" decoding="async" src="assets/design-133.webp"><img data-s alt="Pop-up item · Keys" decoding="async" src="assets/design-134.webp">
+            <div class="cap"><span class="cl">Gameplay clip</span><span class="cn">1 / 7</span></div>
+            <button type="button" class="nx prev" aria-label="Previous item"><svg class="ar l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+            <button type="button" class="nx next" aria-label="Next item"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><path d="M7.5 12h12M14.5 6.5 20 12l-5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="shade" aria-hidden="true"></div>
+    </section>
+    <section class="figma" id="figma" aria-label="Figma files">
+      <div class="figma-h">
+        <h2 class="display">Figma files</h2>
+        <p>Web page designs I built in Figma, from the main page and navigation to product, pricing, news and contact pages. Each one opens the file in a new tab.</p>
+      </div>
+      <div class="rows"><a class="row" href="https://www.figma.com/design/AqDJXYQdxKnpuKQpod58fb/Main-web-page?node-id=0-1&amp;t=c9ZMjUF9DJh5q3wF-1" target="_blank" rel="noopener noreferrer"><span class="rn">01</span><span class="nm">Main web page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/AqDJXYQdxKnpuKQpod58fb/Untitled?node-id=2-2&amp;t=A1PzTb6wlmlKEexE-1" target="_blank" rel="noopener noreferrer"><span class="rn">02</span><span class="nm">Main web page · selected frame</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/zYznbWpDwmfegcGFAO9suI/Menu?node-id=0-1&amp;t=juxg9YswZawS44VY-1" target="_blank" rel="noopener noreferrer"><span class="rn">03</span><span class="nm">Menu</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/CslBx8ZMEaXvP83yv5buqw/Product-Page?t=c9ZMjUF9DJh5q3wF-1" target="_blank" rel="noopener noreferrer"><span class="rn">04</span><span class="nm">Product page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/WMAFU3AZ5UM0lui1ll2SIN/Pricing-Page?node-id=0-1&amp;t=7RsuwLxS1o6ji4mN-1" target="_blank" rel="noopener noreferrer"><span class="rn">05</span><span class="nm">Pricing page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/EU894rcqWHRhsmxZq1U1gC/About-Us-Page?node-id=0-1&amp;t=MHAdFIqyvmChBIrF-1" target="_blank" rel="noopener noreferrer"><span class="rn">06</span><span class="nm">About us page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/6813g5Hx4d7vLRhKHH8L0S/News-Page?node-id=0-1&amp;t=QBmaRpsyRbsQ3AOA-1" target="_blank" rel="noopener noreferrer"><span class="rn">07</span><span class="nm">News page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/NZvZ3tHWPxzglhoCVMDyL3/Article?node-id=0-1&amp;t=juxg9YswZawS44VY-1" target="_blank" rel="noopener noreferrer"><span class="rn">08</span><span class="nm">Article</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/7m3acdHWFyk8uiPeqMiiYs/Related-Articles?node-id=0-1&amp;t=juxg9YswZawS44VY-1" target="_blank" rel="noopener noreferrer"><span class="rn">09</span><span class="nm">Related articles</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/GbWMWiKqRkuQ9zIkkZUaS6/FAQ?node-id=0-1&amp;t=7RsuwLxS1o6ji4mN-1" target="_blank" rel="noopener noreferrer"><span class="rn">10</span><span class="nm">FAQ</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a><a class="row" href="https://www.figma.com/design/u7s7r255YAxdmOgyHnoWeI/Contact-Page?t=c9ZMjUF9DJh5q3wF-1" target="_blank" rel="noopener noreferrer"><span class="rn">11</span><span class="nm">Contact page</span><span class="go"><span>Open in Figma</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span></a></div>
+      <div class="foot">
+        <span>Ammaarah Basha · Software Developer · Designer · Creative</span>
+        <span><a href="index.html#work">Back to portfolio</a> · <a href="artwork.html">Art gallery</a> · <a href="mailto:ammaarahbasha@gmail.com">ammaarahbasha@gmail.com</a></span>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var mob = window.matchMedia("(max-width: 900px)");
+  function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+
+  // ---------- Screen galleries: wipe transition between screens ----------
+  Array.prototype.forEach.call(document.querySelectorAll("[data-gallery]"), function (chap) {
+    var stage = chap.querySelector(".stage");
+    var imgs = Array.prototype.slice.call(stage.querySelectorAll("[data-s]"));
+    var btns = Array.prototype.slice.call(chap.querySelectorAll(".pick button"));
+    var cl = stage.querySelector(".cl"), cn = stage.querySelector(".cn");
+    var cur = 0, timer = null;
+    function go(i, dir) {
+      i = (i + imgs.length) % imgs.length;
+      if (i === cur) return;
+      dir = dir || (i > cur ? 1 : -1);
+      var old = imgs[cur], nxt = imgs[i];
+      if (old.tagName === "VIDEO") old.pause();
+      imgs.forEach(function (im) { if (im !== old && im !== nxt) im.className = ""; });
+      clearTimeout(timer);
+      old.className = "under";
+      if (reduce) { nxt.className = "on"; old.className = ""; }
+      else {
+        nxt.className = dir > 0 ? "from-b" : "from-t";
+        void nxt.offsetWidth;
+        nxt.className = "on";
+        timer = setTimeout(function () { old.className = ""; }, 1000);
+      }
+      cur = i;
+      btns.forEach(function (b, k) { b.classList.toggle("on", k === i); b.setAttribute("aria-pressed", k === i ? "true" : "false"); });
+      cl.textContent = btns[i] ? btns[i].getAttribute("data-label") : imgs[i].alt;
+      cn.textContent = (i + 1) + " / " + imgs.length;
+      var ab = btns[i]; if (ab && ab.parentNode.scrollHeight > ab.parentNode.clientHeight + 2 && !mob.matches) ab.scrollIntoView({ block: "nearest" });
+    }
+    btns.forEach(function (b, k) { b.addEventListener("click", function () { go(k); }); });
+    stage.querySelector(".prev").addEventListener("click", function (e) { e.stopPropagation(); go(cur - 1, -1); });
+    stage.querySelector(".next").addEventListener("click", function (e) { e.stopPropagation(); go(cur + 1, 1); });
+    stage.addEventListener("click", function (e) { if (e.target.tagName === "VIDEO") return; go(cur + 1, 1); });
+    stage.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(cur + 1, 1); }
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(cur - 1, -1); }
+    });
+    var tx = null;
+    stage.addEventListener("touchstart", function (e) { tx = e.target.tagName === "VIDEO" ? null : e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+    }, { passive: true });
+  });
+
+  // ---------- Slide decks: card shuffle ----------
+  var dkTabs = Array.prototype.slice.call(document.querySelectorAll("[data-deck-tab]"));
+  var decks = Array.prototype.slice.call(document.querySelectorAll(".dk")).map(function (el) {
+    var cards = Array.prototype.slice.call(el.querySelectorAll(".card"));
+    var d = { el: el, cards: cards, order: cards.map(function (_, i) { return i; }), busy: false };
+    function apply(skip) {
+      d.order.forEach(function (ci, o) {
+        var c = cards[ci];
+        if (c === skip) return;
+        c.style.setProperty("--o", Math.min(o, 4));
+        c.classList.toggle("far", o > 3);
+      });
+    }
+    d.apply = apply; apply();
+    return d;
+  });
+  var activeDeck = 0;
+  var dnEl = document.getElementById("dn"), dtEl = document.getElementById("dt");
+  function label() {
+    var d = decks[activeDeck];
+    dnEl.textContent = (d.order[0] + 1) + " / " + d.cards.length;
+    dtEl.textContent = dkTabs[activeDeck].getAttribute("data-title");
+  }
+  function next() {
+    var d = decks[activeDeck]; if (d.busy || d.cards.length < 2) return;
+    d.busy = true;
+    var ci = d.order.shift(); d.order.push(ci);
+    var c = d.cards[ci];
+    c.classList.add("fly");
+    d.apply(c); label();
+    setTimeout(function () {
+      c.classList.add("nt"); c.classList.remove("fly");
+      c.style.setProperty("--o", Math.min(d.order.length - 1, 4));
+      c.classList.toggle("far", d.order.length - 1 > 3);
+      void c.offsetWidth; c.classList.remove("nt"); d.busy = false;
+    }, reduce ? 0 : 520);
+  }
+  function prev() {
+    var d = decks[activeDeck]; if (d.busy || d.cards.length < 2) return;
+    d.busy = true;
+    var ci = d.order.pop(); d.order.unshift(ci);
+    var c = d.cards[ci];
+    c.classList.add("nt", "fly", "far"); c.classList.remove("far");
+    void c.offsetWidth;
+    c.classList.remove("nt"); c.classList.remove("fly");
+    d.apply(); label();
+    setTimeout(function () { d.busy = false; }, reduce ? 0 : 500);
+  }
+  if (decks.length) {
+    document.getElementById("dkNext").addEventListener("click", next);
+    document.getElementById("dkPrev").addEventListener("click", prev);
+    decks.forEach(function (d) { d.el.addEventListener("click", next); });
+    var wrap = document.getElementById("dkwrap");
+    wrap.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); } else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+    });
+    dkTabs.forEach(function (b, i) {
+      b.addEventListener("click", function () {
+        activeDeck = i;
+        dkTabs.forEach(function (x, k) { x.classList.toggle("on", k === i); x.setAttribute("aria-pressed", k === i ? "true" : "false"); });
+        decks.forEach(function (d, k) { d.el.hidden = k !== i; });
+        label();
+      });
+    });
+    label();
+  }
+
+  // ---------- Stacking chapters, rail and progress ----------
+  var chaps = Array.prototype.slice.call(document.querySelectorAll(".chap"));
+  var railLinks = Array.prototype.slice.call(document.querySelectorAll("#rail a"));
+  var figma = document.getElementById("figma");
+  var bar = document.getElementById("bar");
+  var ticking = false;
+  function update() {
+    ticking = false;
+    var vh = window.innerHeight, sy = window.scrollY;
+    var max = document.documentElement.scrollHeight - vh;
+    bar.style.transform = "scaleX(" + (max > 0 ? clamp(sy / max, 0, 1) : 0).toFixed(4) + ")";
+    var all = chaps.concat(figma ? [figma] : []);
+    var activeIdx = -1;
+    for (var i = 0; i < chaps.length; i++) {
+      var inner = chaps[i].firstElementChild, shade = chaps[i].lastElementChild;
+      var nxt = all[i + 1];
+      var t = nxt ? clamp(nxt.getBoundingClientRect().top / vh, 0, 1) : 1;
+      if (!reduce && !mob.matches) {
+        inner.style.transform = "scale(" + (1 - (1 - t) * 0.06).toFixed(4) + ")";
+        shade.style.opacity = ((1 - t) * 0.6).toFixed(3);
+      } else { inner.style.transform = ""; shade.style.opacity = 0; }
+      var r = chaps[i].getBoundingClientRect();
+      if (r.top <= vh * 0.5 && (!nxt || nxt.getBoundingClientRect().top > vh * 0.5)) activeIdx = i;
+    }
+    if (figma && figma.getBoundingClientRect().top <= vh * 0.5) activeIdx = chaps.length;
+    railLinks.forEach(function (a, k) { a.classList.toggle("on", k === activeIdx); });
+  }
+  function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener("scroll", req, { passive: true });
+  window.addEventListener("resize", req);
+  update();
+})();
+</script>
+
+<script>
+(function () {
+  if (!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var MODE = "chap";
+  var el = document.createElement("div"); el.className = "cur"; el.setAttribute("aria-hidden", "true"); document.body.appendChild(el);
+  var tx = -100, ty = -100, x = -100, y = -100, raf = 0, lastT = null, shown = false;
+  var HOT = "a,button,input,select,textarea,summary,label,video,.card,.dk,[role=button]";
+  function hex(h) { h = (h || "").trim(); if (h.charAt(0) !== "#") return null; if (h.length === 4) h = "#" + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]; if (h.length !== 7) return null; return parseInt(h.substr(1, 2), 16) + "," + parseInt(h.substr(3, 2), 16) + "," + parseInt(h.substr(5, 2), 16); }
+  function lum(c) { var m = c.match(/[\d.]+/g); if (!m || m.length < 3) return null; if (m.length > 3 && parseFloat(m[3]) < 0.05) return null; return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; }
+  function pick(t) {
+    var rgb = "142,238,176";
+    if (MODE === "chap") {
+      var s = t.closest(".chap");
+      if (s) { var v = hex(getComputedStyle(s).getPropertyValue("--ac")); if (v) rgb = v; }
+    } else {
+      for (var n = t, l = null; n && n.nodeType === 1; n = n.parentElement) { l = lum(getComputedStyle(n).backgroundColor); if (l !== null) break; }
+      if (l !== null && l > 0.6) rgb = "56,96,255";
+    }
+    el.style.setProperty("--cc", rgb);
+  }
+  function loop() {
+    x += (tx - x) * (reduce ? 1 : 0.2); y += (ty - y) * (reduce ? 1 : 0.2);
+    el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+    raf = (Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1) ? requestAnimationFrame(loop) : 0;
+  }
+  document.addEventListener("mousemove", function (e) {
+    tx = e.clientX; ty = e.clientY;
+    if (!shown) { x = tx; y = ty; shown = true; el.classList.add("on"); }
+    var t = e.target;
+    if (t !== lastT && t.nodeType === 1) { lastT = t; el.classList.toggle("hot", !!t.closest(HOT)); pick(t); }
+    if (!raf) raf = requestAnimationFrame(loop);
+  }, { passive: true });
+  document.addEventListener("mousedown", function () { el.classList.add("dn"); });
+  document.addEventListener("mouseup", function () { el.classList.remove("dn"); });
+  document.documentElement.addEventListener("mouseleave", function () { el.classList.remove("on"); shown = false; });
+})();
+</script>
+</body>
+</html>
