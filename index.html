@@ -457,6 +457,7 @@
     .scard .l { max-width: none; }
   }
   @media (max-width: 340px) { .stack-row { grid-template-columns: minmax(0, 1fr); } }
+  .card .nt { margin: 10px 0 0; font-size: 0.78rem; line-height: 1.4; font-weight: 400; font-style: italic; color: rgba(255, 255, 255, 0.55); max-width: 40ch; }
 </style>
 </head>
 <body>
@@ -654,7 +655,7 @@
   // ---------- Edit your projects here ----------
   var PROJECTS = [
     { num: "01", title: "Study Buddy", sub: "Flutter Application Development", art: "art-shot", cover: "buddy", featured: true, href: "https://study-buddy-auth-2026-26e1b.web.app/", d1: "A student-focused application developed while working through Flutter and Firebase learning tracks.", d2: "The project gave me practical experience with Flutter and Dart, application structure, authentication and Firebase integration while developing my understanding of mobile application development.", tech: "Flutter · Dart · Firebase · Firebase Authentication" },
-    { num: "02", title: "Study Store", sub: "Full-Stack E-Commerce Application", art: "art-shot", cover: "store", featured: true, href: "https://ecommerce-store-tvfg.onrender.com", d1: "A full-stack e-commerce application built with Django as part of my CodeAlpha development work. It focuses on a functional online store with product listings, product details, authentication, shopping cart functionality, orders and database integration.", d2: "I designed the project around a modern, minimal black-and-white visual direction, combining backend functionality with a clean user interface.", tech: "Python · Django · HTML · CSS · SQLite · Git" },
+    { num: "02", title: "Study Store", sub: "Full-Stack E-Commerce Application", art: "art-shot", cover: "store", featured: true, href: "https://ecommerce-store-tvfg.onrender.com", note: "Live demo on a free host. If it has been idle, the first load can take up to a minute.", d1: "A full-stack e-commerce application built with Django as part of my CodeAlpha development work. It focuses on a functional online store with product listings, product details, authentication, shopping cart functionality, orders and database integration.", d2: "I designed the project around a modern, minimal black-and-white visual direction, combining backend functionality with a clean user interface.", tech: "Python · Django · HTML · CSS · SQLite · Git" },
     { num: "03", title: "Vault – Password Checker", sub: "Password Strength Checker", art: "art-shot", cover: "vault", featured: true, href: "https://ammaarah14.github.io/Password_Checker/", d1: "A password checker that helps people assess how strong their passwords are.", d2: "", tech: "" },
     { num: "04", title: "Art Gallery", sub: "Illustration · Ink · Colour", art: "art-gal", tag: "Gallery", cover: true, href: "artwork.html", d1: "A look at my art journey since 2019, from plain black ink to watercolour, acrylic, alcohol markers and oil pastels.", d2: "Open the gallery to explore all 85 pieces.", tech: "Ink · Watercolour · Acrylic · Alcohol markers · Oil pastel" },
     { num: "05", title: "Graphic Design", sub: "Interfaces · Web · Brand · Slides", art: "art-gd", tag: "Design", cover: "gd", href: "graphic-design.html", d1: "App and web interface design, brand and poster art and presentation decks, plus a collection of my Figma files.", d2: "Open the page to browse the projects, the Figma files, a live prototype and a small game preview.", tech: "Figma · UI design · Web design · Brand design · Slide design" }
@@ -692,7 +693,7 @@
         '<span class="arrow">' + arrowSvg + '</span>' +
       '</div>' +
       '<p class="t">' + p.num + ' — ' + p.title + '</p><p class="s">' + p.sub + '</p>' +
-      '<p class="d">' + p.d1 + '</p>' + (p.d2 ? '<p class="d">' + p.d2 + '</p>' : '') + (p.tech ? '<p class="k">' + p.tech + '</p>' : '');
+      '<p class="d">' + p.d1 + '</p>' + (p.d2 ? '<p class="d">' + p.d2 + '</p>' : '') + (p.tech ? '<p class="k">' + p.tech + '</p>' : '') + (p.note ? '<p class="nt">' + p.note + '</p>' : '');
     if (!p.href || p.href === "#") a.addEventListener("click", function (e) { e.preventDefault(); });
     track.appendChild(a);
   });
