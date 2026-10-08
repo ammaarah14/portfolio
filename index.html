@@ -421,6 +421,33 @@
 .cur.hot{width:54px;height:54px;margin:-27px 0 0 -27px;background:rgba(var(--cc,142,238,176),.09)}
 .cur.dn{width:22px;height:22px;margin:-11px 0 0 -11px;background:rgba(var(--cc,142,238,176),.22)}
 @media (hover:none),(pointer:coarse){.cur{display:none}}
+
+  /* About: 3D floating photo tile */
+  .about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 30%); gap: clamp(32px, 5vw, 88px); align-items: start; }
+  .about-text { min-width: 0; }
+  .about-tile { position: relative; justify-self: center; width: min(100%, 340px); padding: 24px 0 56px; perspective: 1100px; }
+  .tile-float { position: relative; transform-style: preserve-3d; animation: tileFloat 7s ease-in-out infinite; }
+  .tile { position: relative; aspect-ratio: 4 / 5; transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.6s var(--expo); will-change: transform; }
+  .tile-face, .tile-back, .tile::before, .tile::after { position: absolute; inset: 0; border-radius: 26px; }
+  .tile-face { padding: 8px; background: linear-gradient(135deg, var(--mint), var(--blue)); transform: translateZ(14px); overflow: hidden; box-shadow: 0 30px 60px -28px rgba(15, 29, 82, 0.55); }
+  .tile-face img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 22%; border-radius: 19px; background: #e8e6ec; }
+  .tile-face::after { content: ""; position: absolute; inset: 8px; border-radius: 19px; pointer-events: none; background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.38) 50%, transparent 62%); background-size: 260% 100%; background-position: var(--sx, 125%) 0; transition: background-position 0.6s var(--expo); }
+  .tile::before { content: ""; background: #4a6fe0; transform: translateZ(8px); }
+  .tile::after { content: ""; background: #3a58b8; transform: translateZ(2px); }
+  .tile-back { background: #0F1D52; transform: translateZ(-4px); }
+  .tile-shadow { position: absolute; left: 12%; right: 12%; bottom: 14px; height: 30px; border-radius: 50%; background: radial-gradient(closest-side, rgba(15, 29, 82, 0.4), transparent); filter: blur(7px); animation: tileShadow 7s ease-in-out infinite; }
+  @keyframes tileFloat { 0%, 100% { transform: translateY(0) rotateX(3deg) rotateY(-7deg) rotateZ(-1.2deg); } 50% { transform: translateY(-16px) rotateX(-2deg) rotateY(6deg) rotateZ(1.2deg); } }
+  @keyframes tileShadow { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(0.82); opacity: 0.55; } }
+  @media (max-width: 900px) {
+    .about { grid-template-columns: 1fr; }
+    .about-tile { order: -1; width: min(70%, 260px); justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile-float, .tile-shadow { animation: none; }
+    .tile { transition: none; }
+  }
+  /* Study Store card: show the whole design */
+  .cover.art-shot img.shot.fit { object-fit: contain; background: #000; }
 </style>
 </head>
 <body>
@@ -515,9 +542,22 @@
 
   <div class="light" id="practice" data-light>
     <section class="about" id="about" aria-label="About">
+      <div class="about-text">
       <p class="big">I’m Ammaarah, a software developer and creative who enjoys building things from the ground up. My journey in technology has been shaped by curiosity, experimentation, and a genuine interest in understanding how things work.</p>
       <div class="body"><p>I’m currently developing my skills across front-end and full-stack development, working with technologies including Java, Python, Flutter, Firebase, Django, HTML, CSS and JavaScript, while continuing to strengthen my understanding of software development fundamentals.</p><p>What I enjoy most is the process of taking an idea and gradually turning it into something real — whether that means designing an interface, building an application, solving a programming problem, or refining a project until it feels right.</p><p>I also have a strong interest in graphic design and visual creativity. I enjoy thinking about both sides of a digital experience: how something works and how it feels to interact with it.</p><p>I learn best by building. I experiment, make mistakes, figure out what went wrong, and use that experience to improve the next thing I create.</p></div>
       <p class="small">Starting something? <a href="#contact">Say hello</a> or <a href="#work">see the work</a>.</p>
+      </div>
+      <div class="about-tile" id="aboutTile">
+        <div class="tile-shadow" aria-hidden="true"></div>
+        <div class="tile-float">
+          <div class="tile">
+            <div class="tile-back" aria-hidden="true"></div>
+            <div class="tile-face">
+              <img src="assets/about-photo.webp" alt="Portrait of Ammaarah Basha" width="800" height="1000" decoding="async">
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="stack" id="stack" aria-label="Practice">
@@ -579,6 +619,14 @@
       <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/><path d="M7.7 16.3 18 6M9.5 6H18v8.5"/></svg></span>
       <span class="lab"><span>view my work</span><span aria-hidden="true">view my work</span></span>
     </a>
+    <a class="cta" href="assets/Ammaarah_Basha_CV.pdf" target="_blank" rel="noopener">
+      <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+      <span class="lab"><span>view my CV</span><span aria-hidden="true">opens as a PDF</span></span>
+    </a>
+    <a class="cta" href="assets/Ammaarah_Basha_CV.pdf" download="Ammaarah_Basha_CV.pdf">
+      <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg></span>
+      <span class="lab"><span>download my CV</span><span aria-hidden="true">PDF</span></span>
+    </a>
     <div class="legal">
       <span>Ammaarah Basha<br>Software Developer · Designer · Creative</span>
       <ul>
@@ -597,12 +645,13 @@
   // ---------- Edit your projects here ----------
   var PROJECTS = [
     { num: "01", title: "Study Buddy", sub: "Flutter Application Development", art: "art-shot", cover: "buddy", featured: true, href: "https://github.com/ammaarah14/Study_Buddy_Project", d1: "A student-focused application developed while working through Flutter and Firebase learning tracks.", d2: "The project gave me practical experience with Flutter and Dart, application structure, authentication and Firebase integration while developing my understanding of mobile application development.", tech: "Flutter · Dart · Firebase · Firebase Authentication" },
-    { num: "02", title: "Study Store", sub: "Full-Stack E-Commerce Application", art: "art-3", featured: true, href: "https://github.com/ammaarah14/EcommerceStore", d1: "A full-stack e-commerce application built with Django as part of my CodeAlpha development work. It focuses on a functional online store with product listings, product details, authentication, shopping cart functionality, orders and database integration.", d2: "I designed the project around a modern, minimal black-and-white visual direction, combining backend functionality with a clean user interface.", tech: "Python · Django · HTML · CSS · SQLite · Git" },
+    { num: "02", title: "Study Store", sub: "Full-Stack E-Commerce Application", art: "art-shot", cover: "store", featured: true, href: "https://github.com/ammaarah14/EcommerceStore", d1: "A full-stack e-commerce application built with Django as part of my CodeAlpha development work. It focuses on a functional online store with product listings, product details, authentication, shopping cart functionality, orders and database integration.", d2: "I designed the project around a modern, minimal black-and-white visual direction, combining backend functionality with a clean user interface.", tech: "Python · Django · HTML · CSS · SQLite · Git" },
     { num: "03", title: "Vault – Password Checker", sub: "Password Strength Checker", art: "art-shot", cover: "vault", featured: true, href: "https://github.com/ammaarah14/Password_Checker", d1: "A password checker that helps people assess how strong their passwords are.", d2: "", tech: "" },
     { num: "04", title: "Art Gallery", sub: "Illustration · Ink · Colour", art: "art-gal", tag: "Gallery", cover: true, href: "artwork.html", d1: "A look at my art journey since 2019, from plain black ink to watercolour, acrylic, alcohol markers and oil pastels.", d2: "Open the gallery to explore all 85 pieces.", tech: "Ink · Watercolour · Acrylic · Alcohol markers · Oil pastel" },
     { num: "05", title: "Graphic Design", sub: "Interfaces · Web · Brand · Slides", art: "art-gd", tag: "Design", cover: "gd", href: "graphic-design.html", d1: "App and web interface design, brand and poster art and presentation decks, plus a collection of my Figma files.", d2: "Open the page to browse the projects, the Figma files, a live prototype and a small game preview.", tech: "Figma · UI design · Web design · Brand design · Slide design" }
   ];
   var BUDDY_COVER = '<img class="shot" alt="" decoding="async" src="assets/home-008.webp">';
+  var STORE_COVER = '<img class="shot fit" alt="Study Store website design" decoding="async" src="assets/study-store.webp">';
   var VAULT_COVER = '<img class="shot" alt="" decoding="async" src="assets/home-009.webp">';
   var GALLERY_COVER = '<img class="g1" alt="" src="assets/home-010.jpg"><img class="g2" alt="" src="assets/home-011.jpg"><img class="g3" alt="" src="assets/home-012.jpg">';
   var GD_COVER = '<img class="gd1" alt="" src="assets/home-013.webp"><img class="gd2" alt="" src="assets/home-014.webp"><img class="gd3" alt="" src="assets/home-015.webp">';
@@ -629,7 +678,7 @@
     if (/^https?:/.test(p.href || "")) { a.target = "_blank"; a.rel = "noopener noreferrer"; }
     a.setAttribute("aria-label", p.num + " " + p.title.replace(/&amp;/g, "&") + ", " + p.sub.replace(/&amp;/g, "&"));
     a.innerHTML =
-      '<div class="cover ' + p.art + '">' + (p.cover ? (p.cover === 'gd' ? GD_COVER : p.cover === 'buddy' ? BUDDY_COVER : p.cover === 'vault' ? VAULT_COVER : GALLERY_COVER) : '') +
+      '<div class="cover ' + p.art + '">' + (p.cover ? (p.cover === 'gd' ? GD_COVER : p.cover === 'buddy' ? BUDDY_COVER : p.cover === 'vault' ? VAULT_COVER : p.cover === 'store' ? STORE_COVER : GALLERY_COVER) : '') +
         (p.tag ? '<span class="tag">' + p.tag + '</span>' : (p.featured ? '<span class="tag">Featured</span>' : '')) +
         '<span class="arrow">' + arrowSvg + '</span>' +
       '</div>' +
@@ -935,6 +984,25 @@
   document.addEventListener("mousedown", function () { el.classList.add("dn"); });
   document.addEventListener("mouseup", function () { el.classList.remove("dn"); });
   document.documentElement.addEventListener("mouseleave", function () { el.classList.remove("on"); shown = false; });
+})();
+</script>
+<script>
+(function () {
+  var tile = document.getElementById("aboutTile");
+  if (!tile) return;
+  var t = tile.querySelector(".tile");
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  tile.addEventListener("pointermove", function (e) {
+    var r = tile.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+    t.style.setProperty("--ry", (x * 24).toFixed(1) + "deg");
+    t.style.setProperty("--rx", (-y * 18).toFixed(1) + "deg");
+    t.style.setProperty("--sx", (70 - x * 110).toFixed(0) + "%");
+  });
+  tile.addEventListener("pointerleave", function () {
+    t.style.setProperty("--rx", "0deg"); t.style.setProperty("--ry", "0deg"); t.style.setProperty("--sx", "125%");
+  });
 })();
 </script>
 </body>
